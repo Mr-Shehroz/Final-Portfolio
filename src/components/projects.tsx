@@ -26,36 +26,45 @@ const Projects = () => {
       description:
         "Built a full-stack React/Node.js e-commerce store with automated inventory sync across multiple warehouses using webhooks and cron jobs. Reduced manual stock updates by 90%.",
       tech: ["React", "Node.js", "PostgreSQL", "Stripe API"],
-      image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=480&q=80",
-      github: "https://github.com/vercel/next.js",
-      demo: "https://stripe.com/docs/integration"
+      image: "/ecommerce.jpg",
+      github: "https://github.com/Mr-Shehroz/full-ecommerce",
+      demo: "https://full-ecommerce-five-inky.vercel.app/"
     },
     {
-      title: "Automated Client Onboarding System for Beauty Salon",
+      title: "Admin Panel for E-Commerce Web",
       description:
-        "Designed an end-to-end automation system that captures client forms via Google Forms → triggers Airtable entry → sends personalized welcome email + calendar invite — all without human intervention.",
-      tech: ["Google Apps Script", "Airtable", "Zapier", "Webhooks"],
-      image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=480&q=80",
-      github: "https://github.com/airtable/blocks",
-      demo: "https://zapier.com/blog/automation-examples/"
+        "Developed a robust admin dashboard for managing products, orders, users, and analytics. Real-time stats, user roles, inventory tools and bulk operations for easy store maintenance.",
+      tech: ["React", "Redux Toolkit", "Node.js", "MongoDB", "Ant Design"],
+      image: "/admin.jpg",
+      github: "https://github.com/Mr-Shehroz/full-admin",
+      demo: "https://full-admin-delta.vercel.app/"
     },
     {
-      title: "Internal Dashboard for Educational Institute",
+      title: "NFT Landing Page with Headless CMS",
       description:
-        "Developed a real-time analytics dashboard using Next.js + Chart.js to track student performance, attendance, and course completion — integrated with existing LMS APIs for seamless data flow.",
-      tech: ["Next.js", "Chart.js", "MongoDB", "REST API"],
-      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=480&q=80",
-      github: "https://github.com/chartjs/Chart.js/",
-      demo: "https://www.mongodb.com/try"
+        "Created a modern NFT landing page with real-time content editing using Sanity CMS. Includes NFT showcase, wallet connect, creator stories, and dynamic updates from CMS without redeploy.",
+      tech: ["Next.js", "TypeScript", "Sanity.io", "Tailwind CSS", "Web3.js"],
+      image: "/nft.png",
+      github: "https://github.com/Mr-Shehroz/age",
+      demo: "https://age-mocha.vercel.app/"
     },
     {
-      title: "AI-Powered Chatbot for Course Enrollment",
+      title: "Full Stack Blog Platform",
       description:
-        "Created a conversational AI chatbot using Python + Flask that answers FAQs, recommends courses based on user input, and auto-enrolls users into selected programs — reducing support tickets by 65%.",
-      tech: ["Python", "Flask", "OpenAI API", "Twilio SMS"],
-      image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=480&q=80",
-      github: "https://github.com/openai/gym",
-      demo: "https://twilio.com/products/sms"
+        "A full-stack blog system featuring Markdown support, comments, authentication, admin workflow, and deployment-ready API. Built for speed and SEO. Effortless writing, reading and managing blog content.",
+      tech: ["Next.js", "React", "Express.js", "MongoDB", "JWT", "Tailwind CSS"],
+      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=480&q=80",
+      github: "https://github.com/Mr-Shehroz/full-stack-blog",
+      demo: "https://full-stack-blog-rho.vercel.app/"
+    },
+    {
+      title: "Salon Website & Booking System",
+      description:
+        "Developed a modern salon web application with online appointment booking, service selection, stylist profiles, real-time availability, and automated confirmations. Includes admin dashboard to manage bookings, staff, and promotions seamlessly.",
+      tech: ["React", "Next.js", "TypeScript", "Tailwind CSS", "MongoDB"],
+      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=480&q=80",
+      github: "https://github.com/Mr-Shehroz/salon",
+      demo: "https://khushibeautysalon.vercel.app/"
     },
   ];
 
