@@ -187,7 +187,7 @@ const Services = () => {
               style={{ boxSizing: "border-box" }}
             >
               <img
-                src="/services.png"
+                src="/about.svg"
                 alt="Full Stack Developer & Automation Specialist"
                 className="w-full h-full object-cover transition-[transform] duration-400"
                 style={{
