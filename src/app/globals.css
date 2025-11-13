@@ -20,7 +20,99 @@
 }
 
 body {
-  background: var(--background);
+  background: #010A10;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.social-hover {
+  background: linear-gradient(135deg, #00eaff, #007bff);
+}
+
+@keyframes gradient-flow {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+.gradient-line {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1); /* White line with 50% opacity */
+  z-index: 0;
+}
+
+.gradient-line::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 120px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    white,
+    transparent
+  );
+  box-shadow: 0 0 0px rgba(255, 255, 255, 0.5),
+              0 0 0px rgba(255, 255, 255, 0.5);
+  animation: scan-down 8s ease-in-out infinite;
+}
+
+@keyframes scan-down {
+  0% {
+    top: -20px;
+  }
+  100% {
+    top: calc(100vh + 20px);
+  }
+}
+
+/* Staggered positions & delays */
+.gradient-line:nth-child(1) { left: 10%; }
+.gradient-line:nth-child(1)::before { animation-delay: 0s; }
+
+.gradient-line:nth-child(2) { left: 50%; }
+.gradient-line:nth-child(2)::before { animation-delay: 4s; }
+
+.gradient-line:nth-child(3) { left: 90%; }
+.gradient-line:nth-child(3)::before { animation-delay: 12s; }
+
+
+.light:hover::before {
+  content: "";
+  position: absolute;
+  height: 200px;
+  width: 100px;
+  background-color: #139bfd;
+  filter: blur(50px);
+  top: -70px;
+  left: 10px;
+}
+.light1:hover::before {
+  content: "";
+  position: absolute;
+  height: 200px;
+  width: 100px;
+  background-color: #139bfd;
+  filter: blur(50px);
+  top: -70px;
+  right: 10px;
+}
+.light2:before {
+  content: "";
+  position: absolute;
+  height: 200px;
+  width: 100px;
+  background-color: #139bfd;
+  filter: blur(50px);
+  top: -70px;
+  left: 10px;
 }
