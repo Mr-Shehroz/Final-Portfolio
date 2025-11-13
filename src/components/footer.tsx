@@ -1,5 +1,4 @@
 const Footer = () => {
-
   return (
     <footer className="bg-[#06131b] text-white pt-16 pb-8 px-5 border-t border-cyan-500/10 relative overflow-hidden">
       {/* Cosmic Glow Background */}
@@ -28,7 +27,8 @@ const Footer = () => {
         ))}
       </div>
 
-      <div className="max-w-[1386px] mx-auto grid grid-cols-1 lg:grid-cols-4 gap-12">
+      {/* Responsive grid: side by side on md and up */}
+      <div className="max-w-[1386px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
         {/* Column 1: Brand & Newsletter */}
         <div>
           <div className="flex items-center mb-6">
