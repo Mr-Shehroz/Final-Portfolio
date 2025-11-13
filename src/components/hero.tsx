@@ -2,6 +2,7 @@
 import { Montserrat, Poppins } from "next/font/google";
 import { Typewriter } from "react-simple-typewriter";
 import Button from "./ui/button";
+import Link from "next/link";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -73,7 +74,9 @@ const Hero = () => {
           skills that highlights your abilities and professional growth.
         </p>
 
-        <Button>View My Work</Button>
+        <Link href="#portfolio">
+          <Button>View My Work</Button>
+        </Link>
       </div>
     </section>
   );

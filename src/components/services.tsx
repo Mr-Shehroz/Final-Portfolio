@@ -126,7 +126,7 @@ const Services = () => {
           }
         `}
       </style>
-      <section className="text-white py-14 sm:py-20 px-2 px-5 mx-auto max-w-[1386px]">
+      <section id="services" className="text-white py-14 sm:py-20 px-2 px-5 mx-auto max-w-[1386px]">
         {/* Header */}
         <div className="text-center mb-10 sm:mb-12">
           <h5 className="text-cyan-400 text-xs sm:text-sm uppercase tracking-widest font-semibold">

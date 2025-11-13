@@ -15,12 +15,10 @@ const montserrat = Montserrat({
 
 const navLinks = [
   { name: "Home", href: "#" },
-  { name: "About", href: "#" },
-  { name: "Services", href: "#" },
-  { name: "Portfolio", href: "#" },
-  { name: "Blog", href: "#" },
-  { name: "Pricing", href: "#" },
-  { name: "Contact", href: "#" },
+  { name: "About", href: "#about" },
+  { name: "Services", href: "#services" },
+  { name: "Portfolio", href: "#portfolio" },
+  { name: "Contact", href: "#contact" },
 ];
 
 const socialLinks = [

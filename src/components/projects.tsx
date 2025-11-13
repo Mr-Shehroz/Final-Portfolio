@@ -60,7 +60,7 @@ const Projects = () => {
   ];
 
   return (
-    <section className="text-white py-20 px-5 mx-auto max-w-[1386px]">
+    <section id="portfolio" className="text-white py-20 px-5 mx-auto max-w-[1386px]">
       {/* Header */}
       <div className="text-center mb-12">
         <h5 className="text-cyan-400 text-sm uppercase tracking-wider">LATEST PORTFOLIO</h5>

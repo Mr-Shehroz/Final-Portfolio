@@ -46,7 +46,7 @@ const About = () => {
           }
         `}
       </style>
-      <section className="text-white py-20 px-5 mx-auto max-w-[1386px]">
+      <section id="about" className="text-white py-20 px-5 mx-auto max-w-[1386px]">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Left Column - Stats Cards */}
           <div className="flex flex-col gap-8 w-full md:w-auto">

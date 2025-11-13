@@ -61,7 +61,7 @@ const Contact = () => {
   };
 
   return (
-    <section className="text-white py-20 px-5 mx-auto max-w-[1386px]">
+    <section id='contact' className="text-white py-20 px-5 mx-auto max-w-[1386px]">
       <div className="bg-[#06131b] border border-cyan-500/20 rounded-3xl overflow-hidden shadow-2xl relative">
         {/* Glow effect on left */}
         <div
@@ -85,8 +85,8 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">E-mail:</p>
-                  <a href="mailto:nafiz125@gmail.com" className="text-white hover:text-cyan-300 transition-colors">
-                    nafiz125@gmail.com
+                  <a href="mailto:shehroz.programmer@gmail.com" className="text-white hover:text-cyan-300 transition-colors">
+                    shehroz.programmer@gmail.com
                   </a>
                 </div>
               </div>
@@ -99,12 +99,12 @@ const Contact = () => {
                 <div>
                   <p className="text-gray-400 text-sm">GitHub:</p>
                   <a
-                    href="https://github.com/nafiz125"
+                    href="https://github.com/Mr-Shehroz"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white hover:text-cyan-300 transition-colors"
                   >
-                    github.com/nafiz125
+                    github.com/Mr-Shehroz
                   </a>
                 </div>
               </div>
@@ -116,8 +116,8 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">Contact:</p>
-                  <a href="tel:01245789321" className="text-white hover:text-cyan-300 transition-colors">
-                    01245789321
+                  <a href="tel:923255706845" className="text-white hover:text-cyan-300 transition-colors">
+                    +923255706845
                   </a>
                 </div>
               </div>
