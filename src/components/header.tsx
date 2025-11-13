@@ -78,11 +78,11 @@ const Header = () => {
           <div className="flex items-center min-w-[85px]">
             <Link href="#" className="inline-block">
               <Image
-                src="/logo.png"
+                src="/logo1.svg"
                 alt="Logo"
                 width={108}
                 height={36}
-                className="h-auto w-[108px]"
+                className="h-auto 2xl:w-[170px] w-[150px]"
               />
             </Link>
           </div>

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const Footer = () => {
   // Github SVG icon
   const GithubIcon = () => (
@@ -59,12 +61,7 @@ const Footer = () => {
         {/* Column 1: Brand & Newsletter */}
         <div>
           <div className="flex items-center mb-6">
-            <svg width="32" height="32" viewBox="0 0 48 48" fill="none" className="mr-2">
-              <rect width="12" height="24" rx="2" fill="#36ccfd"/>
-              <rect x="16" y="12" width="12" height="12" rx="2" fill="#139bfd"/>
-              <rect x="32" y="8" width="12" height="16" rx="2" fill="#36ccfd"/>
-            </svg>
-            <span className="text-xl font-bold text-cyan-300">VirTuo</span>
+            <Image src="/logo1.svg" height={100} width={100} alt="logo" className="2xl:w-[180px] w-[150px]"/>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold mb-6 leading-tight">
             Get Ready To <br />
