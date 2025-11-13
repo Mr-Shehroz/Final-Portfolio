@@ -35,7 +35,7 @@ const Projects = () => {
       description:
         "Developed a robust admin dashboard for managing products, orders, users, and analytics. Real-time stats, user roles, inventory tools and bulk operations for easy store maintenance.",
       tech: ["React", "Redux Toolkit", "Node.js", "MongoDB", "Ant Design"],
-      image: "/admin.jpg",
+      image: "/panel.jpg",
       github: "https://github.com/Mr-Shehroz/full-admin",
       demo: "https://full-admin-delta.vercel.app/"
     },
@@ -53,7 +53,7 @@ const Projects = () => {
       description:
         "A full-stack blog system featuring Markdown support, comments, authentication, admin workflow, and deployment-ready API. Built for speed and SEO. Effortless writing, reading and managing blog content.",
       tech: ["Next.js", "React", "Express.js", "MongoDB", "JWT", "Tailwind CSS"],
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=480&q=80",
+      image: "/blog.jpg",
       github: "https://github.com/Mr-Shehroz/full-stack-blog",
       demo: "https://full-stack-blog-rho.vercel.app/"
     },
@@ -62,7 +62,7 @@ const Projects = () => {
       description:
         "Developed a modern salon web application with online appointment booking, service selection, stylist profiles, real-time availability, and automated confirmations. Includes admin dashboard to manage bookings, staff, and promotions seamlessly.",
       tech: ["React", "Next.js", "TypeScript", "Tailwind CSS", "MongoDB"],
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=480&q=80",
+      image: "/salon.png",
       github: "https://github.com/Mr-Shehroz/salon",
       demo: "https://khushibeautysalon.vercel.app/"
     },

@@ -116,7 +116,7 @@ const Footer = () => {
             {/* Github (as location replacement) */}
             <div className="flex items-start gap-3">
               <a
-                href="https://github.com/shehroz-elahi"
+                href="https://github.com/Mr-Shehroz"
                 className="w-6 h-6 bg-cyan-500/10 border border-cyan-500 rounded-full flex items-center justify-center hover:bg-cyan-500/20 transition"
                 aria-label="View Github"
                 target="_blank"
@@ -125,12 +125,12 @@ const Footer = () => {
                 <GithubIcon />
               </a>
               <a
-                href="https://github.com/shehroz-elahi"
+                href="https://github.com/Mr-Shehroz"
                 className="text-gray-300 hover:text-cyan-300 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                github.com/shehroz-elahi
+                github.com/Mr-Shehroz
               </a>
             </div>
             {/* Phone */}
