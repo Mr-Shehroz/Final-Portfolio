@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -291,7 +291,9 @@ const SkillsTimeline = () => {
             dotPositions.map((pos, i) => (
               <div
                 key={i}
-                ref={el => (additionalDotsRefs.current[i] = el)}
+                ref={el => {
+                  additionalDotsRefs.current[i] = el;
+                }}
                 className="timeline-inter-dot"
                 style={{
                   top: `calc(${pos}% - 9px)`,
