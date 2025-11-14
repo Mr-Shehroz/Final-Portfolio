@@ -3,6 +3,12 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register ScrollTrigger safely
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const EmailIcon = () => (
   <svg width="22" height="22" fill="none" viewBox="0 0 24 24" className="text-cyan-400">
@@ -28,9 +34,6 @@ const PhoneIcon = () => (
   </svg>
 );
 
-// Dummy api route to be implemented in /pages/api/contact.ts
-// For now, we'll POST to `/api/contact`
-
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -43,76 +46,148 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  // Refs for animation
+  // Animation refs
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const leftRef = useRef<HTMLDivElement | null>(null);
   const rightRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
-
-  useEffect(() => {
-    if (sectionRef.current) {
-      gsap.fromTo(
-        sectionRef.current,
-        { opacity: 0, y: 80 },
-        { opacity: 1, y: 0, duration: 1.1, ease: 'power3.out' }
-      );
-    }
-    if (headingRef.current) {
-      gsap.fromTo(
-        headingRef.current,
-        { opacity: 0, x: -40 },
-        { opacity: 1, x: 0, duration: 1, delay: 0.15, ease: 'power3.out' }
-      );
-    }
-    if (leftRef.current) {
-      gsap.fromTo(
-        leftRef.current,
-        { opacity: 0, x: -60, scale: 0.96 },
-        { opacity: 1, x: 0, scale: 1, duration: 1, delay: 0.28, ease: 'power3.out' }
-      );
-    }
-    if (rightRef.current) {
-      gsap.fromTo(
-        rightRef.current,
-        { opacity: 0, x: 60, scale: 0.96 },
-        { opacity: 1, x: 0, scale: 1, duration: 1, delay: 0.38, ease: 'power3.out' }
-      );
-    }
-  }, []);
-
-  // Animated floating for icons
   const emailIconRef = useRef<HTMLDivElement | null>(null);
   const githubIconRef = useRef<HTMLDivElement | null>(null);
   const phoneIconRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const ctx = gsap.context(() => {
+      // Animate main section
+      if (sectionRef.current) {
+        gsap.fromTo(
+          sectionRef.current,
+          { opacity: 0, y: 80, filter: 'blur(4px)' },
+          {
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0)',
+            duration: 1.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 85%',
+              once: true,
+            },
+          }
+        );
+      }
+
+      // Animate heading
+      if (headingRef.current) {
+        gsap.fromTo(
+          headingRef.current,
+          { opacity: 0, x: -40, filter: 'blur(5px)' },
+          {
+            opacity: 1,
+            x: 0,
+            filter: 'blur(0)',
+            duration: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 85%',
+              once: true,
+            },
+          }
+        );
+      }
+
+      // Animate left column
+      if (leftRef.current) {
+        gsap.fromTo(
+          leftRef.current,
+          { opacity: 0, x: -60, scale: 0.96, filter: 'blur(6px)' },
+          {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            filter: 'blur(0)',
+            duration: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 85%',
+              once: true,
+            },
+          }
+        );
+      }
+
+      // Animate right column (form)
+      if (rightRef.current) {
+        gsap.fromTo(
+          rightRef.current,
+          { opacity: 0, x: 60, scale: 0.96, filter: 'blur(6px)' },
+          {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            filter: 'blur(0)',
+            duration: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 85%',
+              once: true,
+            },
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Floating icons animation (runs after scroll trigger)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const floatAnimations: gsap.core.Tween[] = [];
+
     if (emailIconRef.current) {
-      gsap.to(emailIconRef.current, {
-        y: 7,
-        repeat: -1,
-        yoyo: true,
-        duration: 1.5,
-        ease: 'sine.inOut',
-      });
+      floatAnimations.push(
+        gsap.to(emailIconRef.current, {
+          y: 7,
+          repeat: -1,
+          yoyo: true,
+          duration: 1.5,
+          ease: 'sine.inOut',
+        })
+      );
     }
     if (githubIconRef.current) {
-      gsap.to(githubIconRef.current, {
-        y: -7,
-        repeat: -1,
-        yoyo: true,
-        duration: 1.8,
-        ease: 'sine.inOut',
-      });
+      floatAnimations.push(
+        gsap.to(githubIconRef.current, {
+          y: -7,
+          repeat: -1,
+          yoyo: true,
+          duration: 1.8,
+          ease: 'sine.inOut',
+        })
+      );
     }
     if (phoneIconRef.current) {
-      gsap.to(phoneIconRef.current, {
-        y: 5,
-        repeat: -1,
-        yoyo: true,
-        duration: 2.1,
-        ease: 'sine.inOut',
-      });
+      floatAnimations.push(
+        gsap.to(phoneIconRef.current, {
+          y: 5,
+          repeat: -1,
+          yoyo: true,
+          duration: 2.1,
+          ease: 'sine.inOut',
+        })
+      );
     }
+
+    return () => {
+      (floatAnimations as Array<gsap.core.Tween>).forEach(anim => anim.kill());
+    };
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -125,7 +200,6 @@ const Contact = () => {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    // Validation of essential fields could be stricter, but follow same requirements as before
     if (!formData.name || !formData.email || !formData.message) {
       setIsSubmitting(false);
       setSubmitStatus('error');
@@ -133,35 +207,36 @@ const Contact = () => {
     }
 
     try {
-      // Send form data using axios POST to the API route `/api/contact`
       await axios.post('/api/contact', formData, {
         headers: { 'Content-Type': 'application/json' },
       });
       setIsSubmitting(false);
       setSubmitStatus('success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-      // Animate form success
-      gsap.fromTo(
-        rightRef.current,
-        { backgroundColor: "#0a1a26" },
-        { backgroundColor: "#254153", duration: 0.5, yoyo: true, repeat: 1, ease: "power1.inOut" }
-      );
+      if (rightRef.current) {
+        gsap.fromTo(
+          rightRef.current,
+          { backgroundColor: "#0a1a26" },
+          { backgroundColor: "#254153", duration: 0.5, yoyo: true, repeat: 1, ease: "power1.inOut" }
+        );
+      }
     } catch (error) {
       setIsSubmitting(false);
       setSubmitStatus('error');
-      // Animate error
-      gsap.fromTo(
-        rightRef.current,
-        { backgroundColor: "#0a1a26" },
-        { backgroundColor: "#3a1a1a", duration: 0.33, yoyo: true, repeat: 1, ease: "power1.inOut" }
-      );
+      if (rightRef.current) {
+        gsap.fromTo(
+          rightRef.current,
+          { backgroundColor: "#0a1a26" },
+          { backgroundColor: "#3a1a1a", duration: 0.33, yoyo: true, repeat: 1, ease: "power1.inOut" }
+        );
+      }
     }
   };
 
   return (
     <section id="contact" className="text-white py-20 px-5 mx-auto max-w-[1386px]">
       <div ref={sectionRef} className="bg-[#06131b] border border-cyan-500/20 rounded-3xl overflow-hidden shadow-2xl relative">
-        {/* Glow effect on left */}
+        {/* Glow effect */}
         <div
           className="absolute top-0 left-0 w-1/3 h-full bg-linear-to-r from-cyan-500/10 to-transparent rounded-l-3xl pointer-events-none"
           style={{ filter: 'blur(40px)' }}
@@ -178,7 +253,6 @@ const Contact = () => {
             </h2>
 
             <div className="space-y-6">
-              {/* Email */}
               <div className="flex items-start gap-4 group">
                 <div
                   ref={emailIconRef}
@@ -194,7 +268,6 @@ const Contact = () => {
                 </div>
               </div>
 
-              {/* GitHub */}
               <div className="flex items-start gap-4 group">
                 <div
                   ref={githubIconRef}
@@ -215,7 +288,6 @@ const Contact = () => {
                 </div>
               </div>
 
-              {/* Phone */}
               <div className="flex items-start gap-4 group">
                 <div
                   ref={phoneIconRef}
@@ -347,7 +419,6 @@ const Contact = () => {
         </div>
       </div>
 
-      {/* extra minimal input styling for focus animation (optional but enhances modern look) */}
       <style>
         {`
         .animated-input:focus {

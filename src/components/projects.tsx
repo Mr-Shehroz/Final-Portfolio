@@ -2,8 +2,14 @@
 
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// SVG icons for Github and External Link
+// Register ScrollTrigger once
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+// SVG Icons (unchanged)
 const GithubIcon = () => (
   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" aria-hidden="true">
     <path
@@ -71,58 +77,101 @@ const Projects = () => {
     },
   ];
 
-  // Refs for GSAP animation
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const headerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    // Animate Header
-    if (headerRef.current) {
-      gsap.fromTo(
-        headerRef.current.children,
-        { opacity: 0, y: 30, filter: 'blur(8px)' },
-        {
-          opacity: 1,
-          y: 0,
-          filter: 'blur(0px)',
-          duration: 1.05,
-          stagger: 0.16,
-          ease: "expo.out",
-          delay: 0.12,
-        }
-      );
-    }
-
-    // Animate Project Cards
-    if (cardRefs.current && cardRefs.current.length) {
-      gsap.fromTo(
-        cardRefs.current,
-        { opacity: 0, y: 38, scale: 0.96, filter: "blur(10px)" },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          filter: "blur(0px)",
-          duration: 1.12,
-          stagger: 0.13,
-          ease: "expo.out",
-          delay: 0.55,
-        }
-      );
-    }
-  }, []);
-
-  // Helper for card ref assignment
   const setCardRef = (el: HTMLDivElement | null, i: number) => {
     cardRefs.current[i] = el;
   };
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const ctx = gsap.context(() => {
+      // Animate Header with scale, rotate, and fade-in from the top
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current.children,
+          { opacity: 0, y: -60, scale: 0.96, rotationX: 40, filter: 'blur(20px)' },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotationX: 0,
+            filter: 'blur(0px)',
+            duration: 1.2,
+            stagger: 0.14,
+            ease: 'back.out(1.8)',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 82%',
+              once: true,
+            }
+          }
+        );
+      }
+
+      // Project cards fly in with 3D effect: odd cards from the left, even from the right, also punch a little on arrive
+      if (cardRefs.current.length > 0) {
+        cardRefs.current.forEach((card, i) => {
+          if (!card) return;
+          const fromX = i % 2 === 0 ? -160 : 160;
+          gsap.fromTo(
+            card,
+            {
+              opacity: 0,
+              x: fromX,
+              z: -120,
+              scale: 0.92,
+              rotateY: i % 2 === 0 ? -32 : 32,
+              filter: 'blur(16px)'
+            },
+            {
+              opacity: 1,
+              x: 0,
+              z: 0,
+              scale: 1,
+              rotateY: 0,
+              filter: 'blur(0px)',
+              duration: 1.16 + Math.random() * 0.35,
+              delay: i * 0.12 + 0.1,
+              ease: 'power4.out',
+              scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                once: true,
+              },
+              onComplete: () => {
+                // Fun punch scale on pop-in using GSAP
+                gsap.to(card, {
+                  scale: 1.04,
+                  duration: 0.13,
+                  yoyo: true,
+                  repeat: 1,
+                  ease: 'elastic.in(1,0.5)'
+                });
+              }
+            }
+          );
+        });
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section ref={sectionRef} id="portfolio" className="text-white py-20 px-5 mx-auto max-w-[1386px]">
+    <section
+      ref={sectionRef}
+      id="portfolio"
+      className="text-white py-20 px-5 mx-auto max-w-[1386px]"
+    >
       {/* Header */}
       <div ref={headerRef} className="text-center mb-12">
-        <h5 className="text-cyan-400 text-sm uppercase tracking-wider">LATEST PORTFOLIO</h5>
+        <h5 className="text-cyan-400 text-sm uppercase tracking-wider">
+          LATEST PORTFOLIO
+        </h5>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-2">
           Transforming Ideas into Exceptional Systems
         </h2>
@@ -136,7 +185,7 @@ const Projects = () => {
         {projects.map((project, index) => (
           <div
             key={index}
-            ref={el => setCardRef(el, index)}
+            ref={(el) => setCardRef(el, index)}
             className="group relative bg-[#06131b] border border-cyan-500/20 rounded-xl overflow-hidden transition-all duration-300 will-change-transform"
             tabIndex={0}
           >
@@ -144,7 +193,8 @@ const Projects = () => {
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
               style={{
-                background: 'radial-gradient(circle at 60% 40%, #36ccfd36 20%, #139bfd16 80%, transparent 100%)',
+                background:
+                  'radial-gradient(circle at 60% 40%, #36ccfd36 20%, #139bfd16 80%, transparent 100%)',
                 filter: 'blur(16px)',
                 zIndex: -1,
               }}
@@ -158,7 +208,6 @@ const Projects = () => {
                 className="w-full h-[220px] sm:h-[280px] xl:h-[380px] object-cover transition-transform duration-500 group-hover:scale-[1.04] group-hover:rotate-[-0.5deg]"
                 loading="lazy"
               />
-              {/* Optional subtle overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#06131b] via-transparent to-transparent opacity-90"></div>
             </div>
 
@@ -171,7 +220,7 @@ const Projects = () => {
                 {project.description}
               </p>
 
-              {/* Tech Stack Tags - Fade In on Hover */}
+              {/* Tech Stack Tags */}
               <div className="flex flex-wrap gap-2 mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
                 {project.tech.map((tech, i) => (
                   <span
@@ -190,12 +239,7 @@ const Projects = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="View on Github"
-                  className="inline-flex items-center gap-1 text-sm text-cyan-400 bg-[#36ccfd1a] rounded-lg px-2 py-1 
-                    hover:bg-cyan-500/30 hover:text-cyan-100 
-                    active:bg-cyan-600/40 
-                    focus-visible:ring-2 focus-visible:ring-cyan-400 
-                    transition-all duration-200 group-hover:scale-[1.03] group-hover:shadow-[0_4px_12px_rgba(19,159,253,0.3)]
-                    will-change-transform"
+                  className="inline-flex items-center gap-1 text-sm text-cyan-400 bg-[#36ccfd1a] rounded-lg px-2 py-1 hover:bg-cyan-500/30 hover:text-cyan-100 active:bg-cyan-600/40 focus-visible:ring-2 focus-visible:ring-cyan-400 transition-all duration-200 group-hover:scale-[1.03] group-hover:shadow-[0_4px_12px_rgba(19,159,253,0.3)] will-change-transform"
                 >
                   <GithubIcon />
                 </a>
@@ -204,19 +248,14 @@ const Projects = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="View Demo"
-                  className="inline-flex items-center gap-1 text-sm text-cyan-400 bg-[#36ccfd1a] rounded-lg px-2 py-1 
-                    hover:bg-cyan-500/30 hover:text-cyan-100 
-                    active:bg-cyan-600/40 
-                    focus-visible:ring-2 focus-visible:ring-cyan-400 
-                    transition-all duration-200 group-hover:scale-[1.03] group-hover:shadow-[0_4px_12px_rgba(19,159,253,0.3)]
-                    will-change-transform"
+                  className="inline-flex items-center gap-1 text-sm text-cyan-400 bg-[#36ccfd1a] rounded-lg px-2 py-1 hover:bg-cyan-500/30 hover:text-cyan-100 active:bg-cyan-600/40 focus-visible:ring-2 focus-visible:ring-cyan-400 transition-all duration-200 group-hover:scale-[1.03] group-hover:shadow-[0_4px_12px_rgba(19,159,253,0.3)] will-change-transform"
                 >
                   <ExternalLinkIcon />
                 </a>
               </div>
             </div>
 
-            {/* Lift Effect on Hover */}
+            {/* Lift Shadow on Hover */}
             <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-2xl shadow-cyan-500/20 -z-10"></div>
           </div>
         ))}

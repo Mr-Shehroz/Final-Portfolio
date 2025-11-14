@@ -1,14 +1,22 @@
-'use client'
+'use client';
+
 import Image from "next/image";
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Register ScrollTrigger once
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const Footer = () => {
   const footerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const starRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const logoRef = useRef<HTMLImageElement>(null);
 
-  // Github SVG icon
+  // Icons (unchanged)
   const GithubIcon = () => (
     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" className="text-cyan-400">
       <rect width="24" height="24" rx="12" fill="#0E2232" />
@@ -19,7 +27,6 @@ const Footer = () => {
     </svg>
   );
 
-  // Email SVG icon
   const EmailIcon = () => (
     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" className="text-cyan-400">
       <rect width="24" height="24" rx="12" fill="#0E2232" />
@@ -27,7 +34,6 @@ const Footer = () => {
     </svg>
   );
 
-  // Phone SVG icon
   const PhoneIcon = () => (
     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" className="text-cyan-400">
       <rect width="24" height="24" rx="12" fill="#0E2232" />
@@ -35,59 +41,77 @@ const Footer = () => {
     </svg>
   );
 
-  // Animate footer entrance and items with gsap
+  // Animation setup
   useEffect(() => {
-    if (!footerRef.current) return;
+    if (typeof window === 'undefined') return;
 
-    // Animate footer from bottom fade in
-    gsap.fromTo(
-      footerRef.current,
-      { y: 80, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 1.2,
-        ease: "power4.out",
+    const ctx = gsap.context(() => {
+      // Animate footer entrance
+      if (footerRef.current) {
+        gsap.fromTo(
+          footerRef.current,
+          { y: 80, opacity: 0, filter: 'blur(4px)' },
+          {
+            y: 0,
+            opacity: 1,
+            filter: 'blur(0)',
+            duration: 1.2,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: footerRef.current,
+              start: 'top 90%',
+              once: true,
+            },
+          }
+        );
       }
-    );
 
-    // Animate each column staggered in
-    if (gridRef.current) {
-      const gridChildren = Array.from(gridRef.current.querySelectorAll(":scope > div"));
-      gsap.fromTo(
-        gridChildren,
-        { y: 40, opacity: 0, scale: 0.98 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 1,
-          ease: "power3.out",
-          stagger: 0.17,
-          delay: 0.4,
+      // Animate columns (grid children)
+      if (gridRef.current) {
+        const gridChildren = Array.from(gridRef.current.children);
+        gsap.fromTo(
+          gridChildren,
+          { y: 40, opacity: 0, scale: 0.98, filter: 'blur(5px)' },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            filter: 'blur(0)',
+            duration: 1,
+            ease: 'power3.out',
+            stagger: 0.17,
+            scrollTrigger: {
+              trigger: footerRef.current,
+              start: 'top 90%',
+              once: true,
+            },
+          }
+        );
+      }
+
+      // Start twinkling stars AFTER scroll trigger
+      starRefs.current.forEach((star) => {
+        if (star) {
+          gsap.to(star, {
+            opacity: gsap.utils.random(0.2, 0.6),
+            scale: gsap.utils.random(0.7, 1.3),
+            y: gsap.utils.random(-12, 12),
+            x: gsap.utils.random(-8, 8),
+            duration: gsap.utils.random(1.4, 2.2),
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+            delay: Math.random() * 2,
+          });
         }
-      );
-    }
+      });
+    }, footerRef);
 
-    // Animate "stars" twinkling and floating
-    starRefs.current.forEach((star, i) => {
-      if (star) {
-        gsap.to(star, {
-          opacity: gsap.utils.random(0.2, 0.6, 0.01, true),
-          scale: gsap.utils.random(0.7, 1.3),
-          y: gsap.utils.random(-12, 12),
-          x: gsap.utils.random(-8, 8),
-          duration: gsap.utils.random(1.4, 2.2),
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          delay: Math.random() * 2,
-        });
-      }
-    });
+    return () => ctx.revert();
   }, []);
 
-  // Social hover animation - scale + color vibrance
+  // === INTERACTIVE HOVER EFFECTS (unchanged logic) ===
+
   const handleSocialMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
     gsap.to(e.currentTarget, {
       scale: 1.15,
@@ -109,7 +133,6 @@ const Footer = () => {
     });
   };
 
-  // Fade on email/github/phone icon mouse enter
   const handleContactHoverIn = (e: React.MouseEvent<HTMLAnchorElement>) => {
     gsap.to(e.currentTarget, {
       scale: 1.14,
@@ -127,7 +150,6 @@ const Footer = () => {
     });
   };
 
-  // Quick Links hover lift
   const handleLinkHoverIn = (e: React.MouseEvent<HTMLAnchorElement>) => {
     gsap.to(e.currentTarget, {
       color: "#67e8f9",
@@ -147,8 +169,6 @@ const Footer = () => {
     });
   };
 
-  // Animate the logo on hover - wiggle
-  const logoRef = useRef<HTMLImageElement>(null);
   const handleLogoHover = () => {
     if (!logoRef.current) return;
     gsap.fromTo(
@@ -166,7 +186,7 @@ const Footer = () => {
     );
   };
 
-  // Pre-generate 20 star positions and sizes for stable render
+  // Pre-generate stars
   const STAR_COUNT = 20;
   const starsData = Array.from({ length: STAR_COUNT }).map(() => ({
     width: Math.random() * 2 + 1,
@@ -180,25 +200,22 @@ const Footer = () => {
       ref={footerRef}
       className="bg-[#06131b] text-white pt-16 pb-8 px-5 border-t border-cyan-500/10 relative overflow-hidden"
     >
-      {/* Cosmic Glow Background */}
+      {/* Cosmic Glow */}
       <div
         className="absolute top-0 right-0 w-full h-full pointer-events-none"
         style={{
-          background:
-            "radial-gradient(circle at 90% 20%, #36ccfd16 0%, #139bfd11 75%, transparent 100%)",
+          background: "radial-gradient(circle at 90% 20%, #36ccfd16 0%, #139bfd11 75%, transparent 100%)",
           filter: "blur(80px)",
           zIndex: -1,
         }}
       />
 
-      {/* Stars effect */}
+      {/* Stars */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {starsData.map((star, i) => (
           <div
             key={i}
-            ref={el => {
-              starRefs.current[i] = el;
-            }}
+            ref={el => starRefs.current[i] = el}
             className="absolute rounded-full bg-white opacity-40"
             style={{
               width: `${star.width}px`,
@@ -211,12 +228,12 @@ const Footer = () => {
         ))}
       </div>
 
-      {/* Responsive grid: side by side on md and up */}
+      {/* Grid */}
       <div
         ref={gridRef}
         className="max-w-[1386px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12"
       >
-        {/* Column 1: Brand & Newsletter */}
+        {/* Brand */}
         <div>
           <div className="flex items-center mb-6">
             <Image
@@ -231,27 +248,20 @@ const Footer = () => {
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold mb-6 leading-tight">
             <span>
-              {/* Animate get ready to using gsap split text-like span animation */}
-              <span style={{ display: "inline-block", overflow: 'hidden' }}>
-                {Array.from("Get Ready To").map((char, idx) => (
-                  <span key={idx} style={{ display: 'inline-block' }}>
-                    {char}
-                  </span>
-                ))}
-              </span>
+              {Array.from("Get Ready To").map((char, idx) => (
+                <span key={idx} style={{ display: 'inline-block' }}>{char}</span>
+              ))}
             </span>
             <br />
-            <span className="text-cyan-300" style={{ display: "inline-block", overflow: 'hidden' }}>
+            <span className="text-cyan-300">
               {Array.from("Create Great").map((char, idx) => (
-                <span key={idx} style={{ display: "inline-block" }}>
-                  {char}
-                </span>
+                <span key={idx} style={{ display: "inline-block" }}>{char}</span>
               ))}
             </span>
           </h2>
         </div>
 
-        {/* Column 2: Quick Link */}
+        {/* Quick Links */}
         <div>
           <h3 className="text-lg font-semibold mb-6">Quick Link</h3>
           <ul className="space-y-3">
@@ -270,18 +280,15 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Column 3: Contact */}
+        {/* Contact */}
         <div>
           <h3 className="text-lg font-semibold mb-6">Contact</h3>
           <div className="space-y-4">
-            {/* Email */}
             <div className="flex items-start gap-3">
               <a
                 href="mailto:shehroz.programmer@gmail.com"
                 className="w-6 h-6 bg-cyan-500/10 border border-cyan-500 rounded-full flex items-center justify-center hover:bg-cyan-500/20 transition"
-                aria-label="Send Email"
-                target="_blank"
-                rel="noopener noreferrer"
+                aria-label="Email"
                 onMouseEnter={handleContactHoverIn}
                 onMouseLeave={handleContactHoverOut}
               >
@@ -289,21 +296,16 @@ const Footer = () => {
               </a>
               <a
                 href="mailto:shehroz.programmer@gmail.com"
-                className="text-gray-300 hover:text-cyan-300 transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-cyan-300"
               >
                 shehroz.programmer@gmail.com
               </a>
             </div>
-            {/* Github (as location replacement) */}
             <div className="flex items-start gap-3">
               <a
                 href="https://github.com/Mr-Shehroz"
                 className="w-6 h-6 bg-cyan-500/10 border border-cyan-500 rounded-full flex items-center justify-center hover:bg-cyan-500/20 transition"
-                aria-label="View Github"
-                target="_blank"
-                rel="noopener noreferrer"
+                aria-label="GitHub"
                 onMouseEnter={handleContactHoverIn}
                 onMouseLeave={handleContactHoverOut}
               >
@@ -311,94 +313,67 @@ const Footer = () => {
               </a>
               <a
                 href="https://github.com/Mr-Shehroz"
-                className="text-gray-300 hover:text-cyan-300 transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-cyan-300"
               >
                 github.com/Mr-Shehroz
               </a>
             </div>
-            {/* Phone */}
             <div className="flex items-start gap-3">
               <a
                 href="tel:+923255706845"
                 className="w-6 h-6 bg-cyan-500/10 border border-cyan-500 rounded-full flex items-center justify-center hover:bg-cyan-500/20 transition"
-                aria-label="Call phone"
+                aria-label="Phone"
                 onMouseEnter={handleContactHoverIn}
                 onMouseLeave={handleContactHoverOut}
               >
                 <PhoneIcon />
               </a>
-              <a
-                href="tel:+923255706845"
-                className="text-gray-300 hover:text-cyan-300 transition-colors"
-              >
+              <a href="tel:+923255706845" className="text-gray-300 hover:text-cyan-300">
                 +923255706845
               </a>
             </div>
           </div>
         </div>
 
-        {/* Column 4: Social */}
+        {/* Social */}
         <div>
           <h3 className="text-lg font-semibold mb-6">Follow Us</h3>
           <div className="flex space-x-4">
-            {/* Instagram */}
-            <a
-              href="https://instagram.com/"
-              aria-label="Instagram"
-              className="w-10 h-10 bg-[#0a1a26] border border-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-              onMouseEnter={handleSocialMouseEnter}
-              onMouseLeave={handleSocialMouseLeave}
-            >
-              <svg fill="currentColor" viewBox="0 0 20 20" width="21" height="21">
-                <path d="M10 7.01A2.99 2.99 0 1010 13a2.99 2.99 0 000-5.99zm0 4.93A1.94 1.94 0 1110 8.07a1.94 1.94 0 010 3.87zm4.55-1.42a.704.704 0 01.7-.71.705.705 0 011.41 0 .704.704 0 01-.7.7.704.704 0 01-.71-.7zM10 4.1a5.9 5.9 0 105.9 5.9A5.9 5.9 0 0010 4.1zm0 10.55a4.65 4.65 0 114.65-4.65A4.65 4.65 0 0110 14.65z"/>
-              </svg>
-            </a>
-            {/* LinkedIn */}
-            <a
-              href="https://linkedin.com/"
-              aria-label="LinkedIn"
-              className="w-10 h-10 bg-[#0a1a26] border border-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-              onMouseEnter={handleSocialMouseEnter}
-              onMouseLeave={handleSocialMouseLeave}
-            >
-              <svg fill="currentColor" viewBox="0 0 24 24" width="21" height="21">
-                <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11.4 19h-3v-9h3v9zm-1.5-10.29c-.97 0-1.75-.79-1.75-1.76s.78-1.76 1.75-1.76 1.75.79 1.75 1.76-.78 1.76-1.75 1.76zm14.9 10.29h-3v-4.89c0-1.16-.02-2.65-1.62-2.65-1.62 0-1.87 1.27-1.87 2.57v4.97h-3v-9h2.89v1.23h.04c.4-.76 1.38-1.56 2.83-1.56 3.02 0 3.58 1.99 3.58 4.58v5.75z" />
-              </svg>
-            </a>
-            {/* Twitter/X */}
-            <a
-              href="https://x.com/"
-              aria-label="Twitter"
-              className="w-10 h-10 bg-[#0a1a26] border border-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-              onMouseEnter={handleSocialMouseEnter}
-              onMouseLeave={handleSocialMouseLeave}
-            >
-              <svg fill="currentColor" viewBox="0 0 24 24" width="21" height="21">
-                <path d="M21.543 7.104c.015.207.015.414.015.623 0 6.348-4.836 13.657-13.657 13.657-2.71 0-5.23-.792-7.358-2.143.377.044.753.066 1.13.066 2.25 0 4.32-.765 5.967-2.056-2.104-.04-3.885-1.428-4.504-3.328.292.055.59.083.897.083.435 0 .86-.06 1.257-.166-2.213-.447-3.879-2.397-3.879-4.736v-.06c.652.362 1.4.58 2.194.605-1.3-.872-2.154-2.36-2.154-4.042 0-.893.24-1.728.66-2.445 2.407 2.954 6.013 4.896 10.078 5.1-.084-.357-.128-.73-.128-1.115 0-2.685 2.179-4.864 4.868-4.864 1.398 0 2.666.59 3.553 1.54 1.11-.217 2.16-.625 3.102-1.184-.366 1.142-1.137 2.098-2.145 2.705 1-.119 1.958-.385 2.842-.777-.664.993-1.504 1.87-2.473 2.573z"/>
-              </svg>
-            </a>
-            {/* Facebook */}
-            <a
-              href="https://facebook.com/"
-              aria-label="Facebook"
-              className="w-10 h-10 bg-[#0a1a26] border border-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-              onMouseEnter={handleSocialMouseEnter}
-              onMouseLeave={handleSocialMouseLeave}
-            >
-              <svg fill="currentColor" viewBox="0 0 24 24" width="21" height="21">
-                <path d="M22.675 0h-21.35c-.733 0-1.325.592-1.325 1.326v21.348c0 .733.592 1.326 1.325 1.326h11.495v-9.294h-3.078v-3.622h3.078v-2.671c0-3.066 1.872-4.736 4.602-4.736 1.312 0 2.437.097 2.768.141v3.213l-1.899.001c-1.492 0-1.783.709-1.783 1.751v2.301h3.567l-.465 3.622h-3.102V24h6.075c.73 0 1.323-.593 1.323-1.326V1.326C24 .592 23.405 0 22.675 0"/>
-              </svg>
-            </a>
+            {[
+              { name: "Instagram", href: "https://instagram.com/", icon: (
+                <svg fill="currentColor" viewBox="0 0 20 20" width="21" height="21">
+                  <path d="M10 7.01A2.99 2.99 0 1010 13a2.99 2.99 0 000-5.99zm0 4.93A1.94 1.94 0 1110 8.07a1.94 1.94 0 010 3.87zm4.55-1.42a.704.704 0 01.7-.71.705.705 0 011.41 0 .704.704 0 01-.7.7.704.704 0 01-.71-.7zM10 4.1a5.9 5.9 0 105.9 5.9A5.9 5.9 0 0010 4.1zm0 10.55a4.65 4.65 0 114.65-4.65A4.65 4.65 0 0110 14.65z"/>
+                </svg>
+              )},
+              { name: "LinkedIn", href: "https://linkedin.com/", icon: (
+                <svg fill="currentColor" viewBox="0 0 24 24" width="21" height="21">
+                  <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11.4 19h-3v-9h3v9zm-1.5-10.29c-.97 0-1.75-.79-1.75-1.76s.78-1.76 1.75-1.76 1.75.79 1.75 1.76-.78 1.76-1.75 1.76zm14.9 10.29h-3v-4.89c0-1.16-.02-2.65-1.62-2.65-1.62 0-1.87 1.27-1.87 2.57v4.97h-3v-9h2.89v1.23h.04c.4-.76 1.38-1.56 2.83-1.56 3.02 0 3.58 1.99 3.58 4.58v5.75z" />
+                </svg>
+              )},
+              { name: "Twitter", href: "https://x.com/", icon: (
+                <svg fill="currentColor" viewBox="0 0 24 24" width="21" height="21">
+                  <path d="M21.543 7.104c.015.207.015.414.015.623 0 6.348-4.836 13.657-13.657 13.657-2.71 0-5.23-.792-7.358-2.143.377.044.753.066 1.13.066 2.25 0 4.32-.765 5.967-2.056-2.104-.04-3.885-1.428-4.504-3.328.292.055.59.083.897.083.435 0 .86-.06 1.257-.166-2.213-.447-3.879-2.397-3.879-4.736v-.06c.652.362 1.4.58 2.194.605-1.3-.872-2.154-2.36-2.154-4.042 0-.893.24-1.728.66-2.445 2.407 2.954 6.013 4.896 10.078 5.1-.084-.357-.128-.73-.128-1.115 0-2.685 2.179-4.864 4.868-4.864 1.398 0 2.666.59 3.553 1.54 1.11-.217 2.16-.625 3.102-1.184-.366 1.142-1.137 2.098-2.145 2.705 1-.119 1.958-.385 2.842-.777-.664 993-1.504 1.87-2.473 2.573z"/>
+                </svg>
+              )},
+              { name: "Facebook", href: "https://facebook.com/", icon: (
+                <svg fill="currentColor" viewBox="0 0 24 24" width="21" height="21">
+                  <path d="M22.675 0h-21.35c-.733 0-1.325.592-1.325 1.326v21.348c0 .733.592 1.326 1.325 1.326h11.495v-9.294h-3.078v-3.622h3.078v-2.671c0-3.066 1.872-4.736 4.602-4.736 1.312 0 2.437.097 2.768.141v3.213l-1.899.001c-1.492 0-1.783.709-1.783 1.751v2.301h3.567l-.465 3.622h-3.102V24h6.075c.73 0 1.323-.593 1.323-1.326V1.326C24 .592 23.405 0 22.675 0"/>
+                </svg>
+              )}
+            ].map((social, i) => (
+              <a
+                key={i}
+                href={social.href}
+                aria-label={social.name}
+                className="w-10 h-10 bg-[#0a1a26] border border-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+                onMouseEnter={handleSocialMouseEnter}
+                onMouseLeave={handleSocialMouseLeave}
+              >
+                {social.icon}
+              </a>
+            ))}
           </div>
         </div>
       </div>
