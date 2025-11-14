@@ -1,11 +1,13 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Pagination, Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import gsap from 'gsap';
 
 const testimonials = [
   {
@@ -84,13 +86,81 @@ const getInitials = (name: string) =>
     .slice(0, 2);
 
 const Testimonials = () => {
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  // Animate the whole section and testimonial cards in view
+  useEffect(() => {
+    if (sectionRef.current) {
+      gsap.fromTo(
+        sectionRef.current,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "expo.out"
+        }
+      );
+    }
+  }, []);
+
+  // Animate the title & subtitle
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const q = sectionRef.current.querySelectorAll('[data-animate="title"], [data-animate="subtitle"]');
+    gsap.fromTo(
+      q,
+      { opacity: 0, y: 25, filter: 'blur(6px)' },
+      {
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0)',
+        duration: 0.85,
+        stagger: 0.10,
+        ease: "power3.out",
+        delay: 0.14
+      }
+    );
+  }, []);
+
+  // Animate the testimonial cards on mount/staggered
+  useEffect(() => {
+    if (!slideRefs.current || !slideRefs.current.length) return;
+    gsap.fromTo(
+      slideRefs.current,
+      {
+        opacity: 0,
+        y: 64,
+        scale: 0.96,
+        filter: 'blur(12px)'
+      },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        filter: 'blur(0px)',
+        duration: 1.15,
+        ease: "power3.out",
+        stagger: 0.11,
+        delay: 0.37
+      }
+    );
+  }, [slideRefs.current.length]);
+
   return (
     <section id="testimonials" className="py-20 bg-[#03101A] relative">
-      <div className="max-w-[1520px] mx-auto px-4 sm:px-6">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-3 text-[#36ccfd] tracking-tight drop-shadow-xl">
+      <div className="max-w-[1520px] mx-auto px-4 sm:px-6" ref={sectionRef}>
+        <h2
+          data-animate="title"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-3 text-[#36ccfd] tracking-tight drop-shadow-xl"
+        >
           Testimonials
         </h2>
-        <p className="text-[#bde3f5] text-center text-base sm:text-lg mb-12">
+        <p
+          data-animate="subtitle"
+          className="text-[#bde3f5] text-center text-base sm:text-lg mb-12"
+        >
           What clients and colleagues say
         </p>
 
@@ -128,18 +198,21 @@ const Testimonials = () => {
           {testimonials.map((t, i) => (
             <SwiperSlide key={i}>
               <div
+                ref={(el) => {
+                  slideRefs.current[i] = el;
+                }}
                 style={{
                   minHeight: 320,
                   maxWidth: 550,
                   width: "97%",
                   margin: "0 auto",
                 }}
-                className="relative bg-[#06131b]/90 border border-[#36ccfd2f] rounded-3xl px-6 py-10 sm:px-12 sm:py-12 md:px-14 md:py-14 lg:px-14 lg:py-12 shadow-2xl group transition-all duration-300 hover:scale-[1.045] hover:shadow-[0_20px_60px_0_#2bb7fc3f,0_0_22px_5px_#36ccfd58] hover:border-[#36ccfd]"
+                className="relative bg-[#06131b]/90 border border-[#36ccfd2f] rounded-3xl px-6 py-10 sm:px-12 sm:py-12 md:px-14 md:py-14 lg:px-14 lg:py-12 shadow-2xl group transition-all duration-300 hover:scale-[1.045] hover:shadow-[0_20px_60px_0_#2bb7fc3f,0_0_22px_5px_#36ccfd58] hover:border-[#36ccfd] will-change-transform"
               >
                 {/* Avatar & Info */}
                 <div className="flex items-center mb-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-[#12334b] border-[3px] border-[#36ccfd88] flex items-center justify-center overflow-hidden shadow-xl group-hover:border-[#36ccfd] group-hover:scale-110 group-hover:shadow-[0_0_0_9px_#36ccfd2e] transition-all duration-300">
+                  <div className="shrink-0">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-[#12334b] border-[3px] border-[#36ccfd88] flex items-center justify-center overflow-hidden shadow-xl group-hover:border-[#36ccfd] group-hover:scale-110 group-hover:shadow-[0_0_0_9px_#36ccfd2e] transition-all duration-300 will-change-transform">
                       {t.avatar ? (
                         <img
                           src={t.avatar}

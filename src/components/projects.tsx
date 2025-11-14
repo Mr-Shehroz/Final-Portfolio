@@ -1,5 +1,8 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
+import gsap from 'gsap';
+
 // SVG icons for Github and External Link
 const GithubIcon = () => (
   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" aria-hidden="true">
@@ -68,10 +71,57 @@ const Projects = () => {
     },
   ];
 
+  // Refs for GSAP animation
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Animate Header
+    if (headerRef.current) {
+      gsap.fromTo(
+        headerRef.current.children,
+        { opacity: 0, y: 30, filter: 'blur(8px)' },
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 1.05,
+          stagger: 0.16,
+          ease: "expo.out",
+          delay: 0.12,
+        }
+      );
+    }
+
+    // Animate Project Cards
+    if (cardRefs.current && cardRefs.current.length) {
+      gsap.fromTo(
+        cardRefs.current,
+        { opacity: 0, y: 38, scale: 0.96, filter: "blur(10px)" },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          duration: 1.12,
+          stagger: 0.13,
+          ease: "expo.out",
+          delay: 0.55,
+        }
+      );
+    }
+  }, []);
+
+  // Helper for card ref assignment
+  const setCardRef = (el: HTMLDivElement | null, i: number) => {
+    cardRefs.current[i] = el;
+  };
+
   return (
-    <section id="portfolio" className="text-white py-20 px-5 mx-auto max-w-[1386px]">
+    <section ref={sectionRef} id="portfolio" className="text-white py-20 px-5 mx-auto max-w-[1386px]">
       {/* Header */}
-      <div className="text-center mb-12">
+      <div ref={headerRef} className="text-center mb-12">
         <h5 className="text-cyan-400 text-sm uppercase tracking-wider">LATEST PORTFOLIO</h5>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-2">
           Transforming Ideas into Exceptional Systems
@@ -86,6 +136,7 @@ const Projects = () => {
         {projects.map((project, index) => (
           <div
             key={index}
+            ref={el => setCardRef(el, index)}
             className="group relative bg-[#06131b] border border-cyan-500/20 rounded-xl overflow-hidden transition-all duration-300 will-change-transform"
             tabIndex={0}
           >

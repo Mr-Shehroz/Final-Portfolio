@@ -1,10 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import gsap from "gsap";
 
 const Services = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [imgHovered, setImgHovered] = useState(false);
+
+  // Refs for animation targets
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const imgContainerRef = useRef<HTMLDivElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
 
   const services = [
     {
@@ -24,6 +31,140 @@ const Services = () => {
     },
   ];
 
+  // Modern, attractive GSAP animations
+  useEffect(() => {
+    // Animate Header & Subtitle
+    if (headerRef.current) {
+      gsap.fromTo(
+        headerRef.current.children,
+        { opacity: 0, y: 34, filter: "blur(7px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 1.1,
+          stagger: 0.14,
+          ease: "expo.out",
+          delay: 0.13,
+        }
+      );
+    }
+
+    // Animate cards (staggered pop, skew+fade)
+    if (cardRefs.current && cardRefs.current.length) {
+      gsap.fromTo(
+        cardRefs.current,
+        {
+          opacity: 0,
+          y: 62,
+          scale: 0.97,
+          filter: "blur(13px)",
+          rotateZ: -7,
+          skewY: 3,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          rotateZ: 0,
+          skewY: 0,
+          duration: 1.08,
+          ease: "back.out(1.65)",
+          stagger: 0.16,
+          delay: 0.35,
+        }
+      );
+    }
+
+    // Animate image entrance (slide, fade, elastic scale)
+    if (imgContainerRef.current) {
+      gsap.fromTo(
+        imgContainerRef.current,
+        {
+          opacity: 0,
+          y: 64,
+          scale: 0.87,
+          filter: "blur(12px)",
+          rotate: 5
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          duration: 1.38,
+          rotate: 0,
+          ease: "elastic.out(1, 0.65)",
+          delay: 0.6,
+        }
+      );
+    }
+  }, []);
+
+  // Animate card sparkle when hovered
+  useEffect(() => {
+    if (
+      hoveredIndex !== null &&
+      cardRefs.current[hoveredIndex]
+    ) {
+      const sparkle = cardRefs.current[hoveredIndex].querySelector(
+        ".services-card-sparkle"
+      );
+      if (sparkle) {
+        gsap.fromTo(
+          sparkle,
+          { opacity: 0, scale: 0.8, rotate: -10, y: -8, x: 8 },
+          {
+            opacity: 0.95,
+            scale: 1.3,
+            rotate: 0,
+            y: 0,
+            x: 0,
+            duration: 0.5,
+            ease: "expo.out",
+            overwrite: "auto",
+          }
+        );
+        // Fade sparkle away
+        gsap.to(sparkle, {
+          opacity: 0,
+          duration: 0.5,
+          delay: 0.48,
+          ease: "power1.in",
+        });
+      }
+    }
+  }, [hoveredIndex]);
+
+  // Animate the hero image sparkle on image hover
+  useEffect(() => {
+    if (imgContainerRef.current) {
+      const sparkle = imgContainerRef.current.querySelector(".services-img-sparkle");
+      if (imgHovered && sparkle) {
+        gsap.fromTo(
+          sparkle,
+          { opacity: 0, y: 15, scale: 0.8, rotate: 18 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotate: 0,
+            duration: 0.64,
+            ease: "expo.out",
+            overwrite: "auto",
+          }
+        );
+        gsap.to(sparkle, {
+          opacity: 0,
+          duration: 0.55,
+          delay: 0.7,
+          ease: "power1.in",
+        });
+      }
+    }
+  }, [imgHovered]);
+
   return (
     <>
       <style>
@@ -37,22 +178,25 @@ const Services = () => {
             border-radius: 1.5rem;
             z-index: 1;
           }
-          .services-card:hover .services-glow {
+          .services-card:hover .services-glow,
+          .services-card:focus-within .services-glow {
             opacity: 1;
           }
           .services-glow {
-            background: radial-gradient(circle at 60% 40%, #36ccfd36 20%, #139bfd16 80%, transparent 100%);
-            filter: blur(16px);
+            background: radial-gradient(circle at 60% 40%, #36ccfd44 12%, #139bfd19 78%, transparent 100%);
+            filter: blur(18px);
           }
           .services-card {
             position: relative;
             overflow: visible;
+            will-change: box-shadow, transform;
           }
-          .services-card:hover {
-            box-shadow: 0 8px 32px 0 #13b5fd44, 0 0 16px 2px #139bfd40;
+          .services-card:hover,
+          .services-card:focus-within {
+            box-shadow: 0 10px 38px 0 #13b5fd45, 0 0 36px 5px #3dd2ff33;
             z-index: 2;
-            transform: translateY(-4px) scale(1.025) rotate(-1deg);
             border-color: #36ccfd;
+            transform: translateY(-8px) scale(1.04) rotate(-1.9deg);
           }
           .services-card .animated-underline {
             position: relative;
@@ -63,29 +207,44 @@ const Services = () => {
             content: '';
             display: block;
             width: 100%;
-            height: 2.5px;
-            background: linear-gradient(90deg, #139bfd 20%, #36ccfd 80%);
+            height: 2.2px;
+            background: linear-gradient(90deg, #139bfd 12%, #36ccfd 88%);
             border-radius: 2px;
             transform: scaleX(0);
-            transition: transform 0.31s cubic-bezier(.29,1.06,.64,1.12);
+            transition: transform 0.47s cubic-bezier(.17,.84,.47,1.13);
             transform-origin: left;
             position: absolute;
-            bottom: -3.5px;
+            bottom: -4.5px;
             left: 0;
-            opacity: 0.95;
+            opacity: 1;
           }
-          .services-card:hover .animated-underline::after {
+          .services-card:hover .animated-underline::after,
+          .services-card:focus-within .animated-underline::after {
             transform: scaleX(1);
+          }
+          .services-card-sparkle {
+            position: absolute;
+            top: 10px;
+            right: 22px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.25s;
+            width: 23px;
+            height: 23px;
           }
 
           .services-img-container {
-            transition: box-shadow 0.33s cubic-bezier(.22,1,.36,1), transform 0.31s cubic-bezier(.17,.67,.83,.67);
-            box-shadow: 0 2px 24px 0 #11baff24, 0 0 1px 1px #0097fc12;
+            transition: box-shadow 0.39s cubic-bezier(.22,1,.36,1), transform 0.36s cubic-bezier(.21,.87,.54,1.15);
+            box-shadow: 0 2px 24px 0 #11baff25, 0 0 3px 1px #0097fc19;
             position: relative;
+            will-change: box-shadow, transform;
           }
-          .services-img-container:hover, .services-img-container.img-hovered {
-            box-shadow: 0 8px 48px 0 #07b6ec80, 0 0 12px 4px #139bfd3d;
-            transform: scale(1.025) translateY(-6px) rotate(1deg);
+          .services-img-container:hover,
+          .services-img-container.img-hovered,
+          .services-img-container:focus-within {
+            box-shadow: 0 18px 64px 0 #07b6ec94, 0 0 26px 7px #139bfd50;
+            transform: scale(1.035) translateY(-11px) rotate(-1.5deg);
             z-index: 2;
           }
           .services-img-glow {
@@ -96,11 +255,23 @@ const Services = () => {
             inset: 0;
             z-index: 2;
             border-radius: 1.5rem;
-            background: radial-gradient(circle at 65% 55%, #36ccfd22 0%, #139bfd0a 55%, transparent 100%);
-            filter: blur(12px);
+            background: radial-gradient(circle at 65% 55%, #36ccfd2b 0%, #139bfd28 65%, transparent 100%);
+            filter: blur(18px);
           }
-          .services-img-container:hover .services-img-glow, .services-img-container.img-hovered .services-img-glow {
-            opacity: 0.77;
+          .services-img-container:hover .services-img-glow,
+          .services-img-container.img-hovered .services-img-glow,
+          .services-img-container:focus-within .services-img-glow {
+            opacity: 0.96;
+          }
+          .services-img-sparkle {
+            pointer-events: none;
+            position: absolute;
+            opacity: 0;
+            z-index: 13;
+            top: 3%;
+            right: 2%;
+            width: 44px;
+            height: 44px;
           }
           @media (max-width: 1024px) {
             .services-img-container {
@@ -126,9 +297,14 @@ const Services = () => {
           }
         `}
       </style>
-      <section id="services" className="text-white py-14 sm:py-20 px-2 px-5 mx-auto max-w-[1386px]">
+
+      <section
+        id="services"
+        className="text-white py-14 sm:py-20 px-2 px-5 mx-auto max-w-[1386px]"
+        ref={sectionRef}
+      >
         {/* Header */}
-        <div className="text-center mb-10 sm:mb-12">
+        <div ref={headerRef} className="text-center mb-10 sm:mb-12">
           <h5 className="text-cyan-400 text-xs sm:text-sm uppercase tracking-widest font-semibold">
             LATEST SERVICE
           </h5>
@@ -148,10 +324,9 @@ const Services = () => {
             {services.map((service, index) => (
               <div
                 key={index}
-                className={`services-card bg-[#06131b] border border-cyan-500/20 rounded-3xl p-7 xl:p-10 transition-all duration-300 cursor-pointer
-          ${hoveredIndex === index ? "border-cyan-400 shadow-2xl" : ""}
-        `}
+                className={`services-card bg-[#06131b] border border-cyan-500/25 rounded-3xl p-7 xl:p-10 transition-all duration-300 cursor-pointer`}
                 tabIndex={0}
+                ref={el => { cardRefs.current[index] = el; }}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 onFocus={() => setHoveredIndex(index)}
@@ -169,6 +344,33 @@ const Services = () => {
                 <p className="text-gray-300 text-[0.97rem] sm:text-base leading-relaxed">
                   {service.description}
                 </p>
+                {/* Sparkle effect */}
+                <svg
+                  className="services-card-sparkle"
+                  fill="none"
+                  viewBox="0 0 37 37"
+                  aria-hidden="true"
+                >
+                  <g filter="url(#services-card-shiny)">
+                    <path
+                      d="M18.5 5L21.2 15.5L32 18.5L21.2 21.5L18.5 32L15.8 21.5L5 18.5L15.8 15.5L18.5 5Z"
+                      fill="#23d5ff"
+                      fillOpacity="0.6"
+                    />
+                  </g>
+                  <defs>
+                    <filter
+                      id="services-card-shiny"
+                      x="0"
+                      y="0"
+                      width="37"
+                      height="37"
+                      filterUnits="userSpaceOnUse"
+                    >
+                      <feGaussianBlur stdDeviation="1.1" />
+                    </filter>
+                  </defs>
+                </svg>
               </div>
             ))}
           </div>
@@ -177,24 +379,25 @@ const Services = () => {
           <div className="w-full mb-8 md:mb-0 md:w-[49%] flex justify-center items-center">
             <div
               className={`relative services-img-container w-full max-w-[406px] sm:max-w-[520px] md:max-w-[562px] h-[220px] sm:h-[350px] md:h-[440px] lg:h-[650px] rounded-2xl overflow-hidden border-[10px] md:border-[14px] lg:border-[15px] border-[#06131B] bg-black light2
-        ${imgHovered ? "img-hovered" : ""}
-      `}
+              ${imgHovered ? "img-hovered" : ""}
+              `}
               onMouseEnter={() => setImgHovered(true)}
               onMouseLeave={() => setImgHovered(false)}
               tabIndex={0}
               onFocus={() => setImgHovered(true)}
               onBlur={() => setImgHovered(false)}
               style={{ boxSizing: "border-box" }}
+              ref={imgContainerRef}
             >
               <img
                 src="/about.svg"
                 alt="Full Stack Developer & Automation Specialist"
                 className="w-full h-full object-cover transition-[transform] duration-400"
                 style={{
-                  transition: "transform 0.29s cubic-bezier(.39,1.17,.65,1)",
+                  transition: "transform 0.33s cubic-bezier(.39,1.17,.65,1)",
                   transform: imgHovered
-                    ? "scale(1.045) rotate(-2deg)"
-                    : "scale(1)",
+                    ? "scale(1.06) rotate(-2.7deg)"
+                    : "scale(1) rotate(0)",
                   zIndex: 3,
                   position: "relative",
                 }}
@@ -202,9 +405,7 @@ const Services = () => {
               <div className="services-img-glow" aria-hidden="true"></div>
               <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-transparent pointer-events-none z-[2]"></div>
               <svg
-                className={`pointer-events-none absolute -top-4 -right-4 w-16 h-16 z-[4] transition-opacity duration-300 ${
-                  imgHovered ? "opacity-90" : "opacity-0"
-                }`}
+                className="services-img-sparkle"
                 fill="none"
                 viewBox="0 0 64 64"
                 aria-hidden="true"
@@ -213,12 +414,12 @@ const Services = () => {
                   <path
                     d="M32 9L36.3 27.7L55 32L36.3 36.3L32 55L27.7 36.3L9 32L27.7 27.7L32 9Z"
                     fill="#23d5ff"
-                    fillOpacity="0.38"
+                    fillOpacity="0.52"
                   />
                   <path
                     d="M32 16L34.5 26.5L45 29L34.5 31.5L32 42L29.5 31.5L19 29L29.5 26.5L32 16Z"
                     fill="#13b4fd"
-                    fillOpacity="0.45"
+                    fillOpacity="0.51"
                   />
                 </g>
                 <defs>
@@ -230,7 +431,7 @@ const Services = () => {
                     height="64"
                     filterUnits="userSpaceOnUse"
                   >
-                    <feGaussianBlur stdDeviation="1.7" />
+                    <feGaussianBlur stdDeviation="2.0" />
                   </filter>
                 </defs>
               </svg>

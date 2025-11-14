@@ -2,10 +2,11 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Montserrat } from "next/font/google";
+import gsap from "gsap";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -63,38 +64,158 @@ const socialLinks = [
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Animation refs
+  const headerRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLUListElement>(null);
+  const socialDesktopRef = useRef<HTMLDivElement>(null);
+  const mobileDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Animate header, logo, nav links, and social icons on mount
+  useEffect(() => {
+    // Header entrance
+    if (headerRef.current) {
+      gsap.fromTo(
+        headerRef.current,
+        { y: -72, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.1,
+          ease: "power3.out",
+        }
+      );
+    }
+
+    // Logo pop in
+    if (logoRef.current) {
+      gsap.fromTo(
+        logoRef.current,
+        { scale: 0.85, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.7, ease: "expo.out", delay: 0.25 }
+      );
+    }
+
+    // Nav links sequential fade/slide
+    if (navRef.current) {
+      gsap.fromTo(
+        navRef.current.children,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: 0.09,
+          duration: 0.7,
+          ease: "power2.out",
+          delay: 0.5
+        }
+      );
+    }
+
+    // Social icons desktop
+    if (socialDesktopRef.current) {
+      gsap.fromTo(
+        socialDesktopRef.current.children,
+        { scale: 0.6, opacity: 0 },
+        {
+          scale: 1, opacity: 1,
+          duration: 0.6,
+          ease: "back.out(1.4)",
+          stagger: 0.09,
+          delay: 0.9,
+        }
+      );
+    }
+  }, []);
+
+  // Animate mobile dropdown open/close
+  useEffect(() => {
+    if (mobileDropdownRef.current) {
+      if (isMenuOpen) {
+        gsap.fromTo(
+          mobileDropdownRef.current,
+          { y: -30, opacity: 0, pointerEvents: 'none' },
+          { y: 0, opacity: 1, pointerEvents: 'auto', duration: 0.4, ease: "power3.out" }
+        );
+        // Animate links inside dropdown
+        gsap.fromTo(
+          mobileDropdownRef.current.querySelectorAll("li"),
+          { x: -24, opacity: 0 },
+          {
+            x: 0, opacity: 1,
+            stagger: 0.09,
+            delay: 0.13,
+            duration: 0.55,
+            ease: "expo.out"
+          }
+        );
+        // Animate mobile socials
+        gsap.fromTo(
+          mobileDropdownRef.current.querySelectorAll("a[aria-label]"),
+          { scale: 0.65, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.42, ease: "back.out(1.5)", stagger: 0.07, delay: 0.07 }
+        );
+      } else {
+        gsap.to(mobileDropdownRef.current, {
+          y: -30,
+          opacity: 0,
+          pointerEvents: 'none',
+          duration: 0.35,
+          ease: "power2.in",
+        });
+      }
+    }
+  }, [isMenuOpen]);
+
   // Close menu on route change (optional if using Next.js App Router)
   useEffect(() => {
     const handleRouteChange = () => setIsMenuOpen(false);
-    // If you were using `next/router`, you'd add here — but for static links, this is enough
     return () => {};
   }, []);
 
   return (
-    <header className="w-full fixed top-0 z-50 bg-[#06131b]/30 backdrop-blur-md border border-white/10 py-1 rounded-bl-2xl rounded-br-2xl">
+    <header
+      ref={headerRef}
+      className="w-full fixed top-0 z-50 bg-[#06131b]/30 backdrop-blur-md border border-white/10 py-1 rounded-bl-2xl rounded-br-2xl"
+    >
       <div className="max-w-[1386px] mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 sm:h-18">
           {/* Logo */}
-          <div className="flex items-center min-w-[85px]">
-            <Link href="#" className="inline-block">
+          <div className="flex items-center min-w-[85px]" ref={logoRef}>
+            <Link href="#" className="inline-block group">
               <Image
                 src="/logo1.svg"
                 alt="Logo"
                 width={108}
                 height={36}
-                className="h-auto 2xl:w-[170px] w-[150px]"
+                className="h-auto 2xl:w-[170px] w-[150px] transition-transform duration-300 group-hover:scale-105"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex flex-1 justify-center min-w-[180px]">
-            <ul className="flex flex-wrap justify-center gap-1">
-              {navLinks.map((link) => (
+            <ul
+              className="flex flex-wrap justify-center gap-1"
+              ref={navRef}
+            >
+              {navLinks.map((link, idx) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className={`text-white hover:bg-[#0C1524] hover:text-[#139bfd] transition-colors font-bold 2xl:text-[1rem] text-[14px] px-3 py-2 rounded-md whitespace-nowrap ${montserrat.className}`}
+                    className={`text-white hover:bg-[#0C1524] hover:text-[#139bfd] transition-all transition-colors duration-300 font-bold 2xl:text-[1rem] text-[14px] px-3 py-2 rounded-md whitespace-nowrap ${montserrat.className}`}
+                    tabIndex={0}
+                    // Slight breath animation on hover, modern effect
+                    style={{
+                      transition:
+                        "color 0.23s cubic-bezier(.7,0,.3,1), background 0.26s cubic-bezier(.8,0,.15,1), transform 0.25s cubic-bezier(.7,0,.2,1)",
+                    }}
+                    onMouseEnter={e => {
+                      gsap.to(e.currentTarget, { scale: 1.09, duration: 0.2, ease: "power1.out" });
+                    }}
+                    onMouseLeave={e => {
+                      gsap.to(e.currentTarget, { scale: 1.0, duration: 0.18, ease: "power1.out" });
+                    }}
                   >
                     {link.name}
                   </a>
@@ -104,7 +225,10 @@ const Header = () => {
           </nav>
 
           {/* Social Icons (Visible on all screens) */}
-          <div className="hidden lg:flex min-w-[105px] justify-end items-center xl:gap-3 gap-2">
+          <div
+            className="hidden lg:flex min-w-[105px] justify-end items-center xl:gap-3 gap-2"
+            ref={socialDesktopRef}
+          >
             {socialLinks.map((social) => (
               <Link
                 key={social.name}
@@ -119,11 +243,16 @@ const Header = () => {
                   shadow-sm hover:shadow-lg
                   border border-gray-700/30 hover:border-sky-400/50
                   backdrop-blur-sm
-                  hover:scale-105"
+                  hover:scale-110"
+                tabIndex={0}
+                onMouseEnter={e =>
+                  gsap.to(e.currentTarget, { scale: 1.13, boxShadow: "0 4px 18px #139bfd55", duration: 0.18, ease: "sine.out" })
+                }
+                onMouseLeave={e =>
+                  gsap.to(e.currentTarget, { scale: 1.0, boxShadow: "0 1px 5px #139bfd1a", duration: 0.22, ease: "sine.out" })
+                }
               >
-                <span className="transition-transform group-hover:scale-110">
-                  {social.icon}
-                </span>
+                <span className="transition-transform group-hover:scale-110">{social.icon}</span>
                 <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-20 bg-gradient-to-br from-sky-400 to-blue-500 blur-sm"></span>
               </Link>
             ))}
@@ -134,6 +263,16 @@ const Header = () => {
             className="lg:hidden flex items-center justify-center w-10 h-10 text-[#139bfd] focus:outline-none"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
+            tabIndex={0}
+            style={{
+              transition: "transform 0.15s cubic-bezier(.7,0,.3,1)",
+            }}
+            onMouseDown={e =>
+              gsap.to(e.currentTarget, { scale: 0.93, duration: 0.12, ease: "power1.in" })
+            }
+            onMouseUp={e =>
+              gsap.to(e.currentTarget, { scale: 1, duration: 0.14, ease: "power1.out" })
+            }
           >
             {isMenuOpen ? (
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -148,8 +287,24 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Dropdown */}
-        {isMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-gray-800">
+        <div
+          style={{
+            pointerEvents: isMenuOpen ? "auto" : "none",
+            // Keep space so layout does not jump
+            minHeight: isMenuOpen ? 170 : 0,
+          }}
+        >
+          <div
+            className="lg:hidden py-4 border-t border-gray-800"
+            ref={mobileDropdownRef}
+            style={{
+              opacity: isMenuOpen ? 1 : 0,
+              transform: isMenuOpen ? "translateY(0px)" : "translateY(-30px)",
+              willChange: "opacity, transform",
+            }}
+            aria-hidden={!isMenuOpen}
+            tabIndex={isMenuOpen ? 0 : -1}
+          >
             <div className="flex justify-end mb-4 pr-4">
               {socialLinks.map((social) => (
                 <Link
@@ -164,6 +319,13 @@ const Header = () => {
                     transition-all duration-300 ease-in-out
                     shadow-sm hover:shadow-md
                     border border-gray-700/30 hover:border-sky-400/50"
+                  tabIndex={isMenuOpen ? 0 : -1}
+                  onMouseEnter={e =>
+                    gsap.to(e.currentTarget, { scale: 1.11, boxShadow: "0 4px 14px #139bfd55", duration: 0.17, ease: "expo.out" })
+                  }
+                  onMouseLeave={e =>
+                    gsap.to(e.currentTarget, { scale: 1.0, boxShadow: "0 1px 5px #139bfd16", duration: 0.16, ease: "expo.out" })
+                  }
                 >
                   <span className="text-[16px] transition-transform group-hover:scale-110">
                     {social.icon}
@@ -177,8 +339,19 @@ const Header = () => {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className={`block text-white hover:bg-[#0C1524] hover:text-[#139bfd] transition-colors font-bold px-4 py-3 rounded-md ${montserrat.className}`}
+                    className={`block text-white hover:bg-[#0C1524] hover:text-[#139bfd] transition-all transition-colors font-bold px-4 py-3 rounded-md ${montserrat.className}`}
                     onClick={() => setIsMenuOpen(false)}
+                    tabIndex={isMenuOpen ? 0 : -1}
+                    style={{
+                      transition:
+                        "color 0.15s cubic-bezier(.5,0,.3,1), background 0.18s cubic-bezier(.8,0,.15,1), transform 0.22s cubic-bezier(.91,-0.02,.2,1.23)",
+                    }}
+                    onMouseEnter={e => {
+                      gsap.to(e.currentTarget, { scale: 1.07, duration: 0.13, ease: "sine.out" });
+                    }}
+                    onMouseLeave={e => {
+                      gsap.to(e.currentTarget, { scale: 1.0, duration: 0.16, ease: "sine.out" });
+                    }}
                   >
                     {link.name}
                   </a>
@@ -186,7 +359,7 @@ const Header = () => {
               ))}
             </ul>
           </div>
-        )}
+        </div>
       </div>
     </header>
   );
