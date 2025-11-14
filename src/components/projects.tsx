@@ -89,67 +89,61 @@ const Projects = () => {
     if (typeof window === 'undefined') return;
 
     const ctx = gsap.context(() => {
-      // Animate Header with scale, rotate, and fade-in from the top
+      // Animate Header with a soft fade and slight upward spring from below, more modern "pop"
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: -60, scale: 0.96, rotationX: 40, filter: 'blur(20px)' },
+          { opacity: 0, y: 40, scale: 0.96, filter: 'blur(18px)' },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            rotationX: 0,
             filter: 'blur(0px)',
-            duration: 1.2,
-            stagger: 0.14,
-            ease: 'back.out(1.8)',
+            duration: 1,
+            stagger: 0.13,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: 'top 82%',
+              start: 'top 85%',
               once: true,
             }
           }
         );
       }
 
-      // Project cards fly in with 3D effect: odd cards from the left, even from the right, also punch a little on arrive
+      // Project cards rise up from below with a springy, lively pop effect
       if (cardRefs.current.length > 0) {
         cardRefs.current.forEach((card, i) => {
           if (!card) return;
-          const fromX = i % 2 === 0 ? -160 : 160;
           gsap.fromTo(
             card,
             {
               opacity: 0,
-              x: fromX,
-              z: -120,
-              scale: 0.92,
-              rotateY: i % 2 === 0 ? -32 : 32,
-              filter: 'blur(16px)'
+              y: 120,
+              scale: 0.94,
+              filter: 'blur(16px)',
             },
             {
               opacity: 1,
-              x: 0,
-              z: 0,
+              y: 0,
               scale: 1,
-              rotateY: 0,
               filter: 'blur(0px)',
-              duration: 1.16 + Math.random() * 0.35,
-              delay: i * 0.12 + 0.1,
-              ease: 'power4.out',
+              duration: 1 + Math.random() * 0.28,
+              delay: i * 0.12 + 0.09,
+              ease: 'elastic.out(1, 0.7)',
               scrollTrigger: {
                 trigger: card,
-                start: 'top 85%',
+                start: 'top 90%',
                 once: true,
               },
               onComplete: () => {
-                // Fun punch scale on pop-in using GSAP
+                // Soft "bounce" to give it a fresh pop (less punchy, more springy)
                 gsap.to(card, {
-                  scale: 1.04,
-                  duration: 0.13,
+                  scale: 1.025,
+                  duration: 0.17,
                   yoyo: true,
                   repeat: 1,
-                  ease: 'elastic.in(1,0.5)'
+                  ease: 'sine.inOut',
                 });
               }
             }

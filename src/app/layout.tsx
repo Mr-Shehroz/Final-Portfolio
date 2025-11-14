@@ -25,7 +25,9 @@ export default function RootLayout({
 
         {/* Actual UI */}
         <Header />
-        <div className="relative z-10">{children}</div>
+        <div className="relative z-10">
+          {children}
+          </div>
         <Footer />
       </body>
     </html>

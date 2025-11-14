@@ -1,5 +1,3 @@
-// app/components/Header.tsx
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -176,45 +174,57 @@ const Header = () => {
   return (
     <header
       ref={headerRef}
-      className="w-full fixed top-0 z-50 bg-[#06131b]/30 backdrop-blur-md border border-white/10 py-1 rounded-bl-2xl rounded-br-2xl"
+      className="
+        w-full fixed top-0 z-50
+        bg-[#06131b]/60
+        backdrop-blur-md
+        border-x border-b border-white/10
+        py-0
+        rounded-b-2xl
+        shadow-[0_4px_32px_rgba(14,25,41,0.24)]
+        max-h-[90px]
+      "
+      style={{
+        WebkitBackdropFilter: "blur(18px)",
+        backdropFilter: "blur(18px)",
+      }}
     >
-      <div className="max-w-[1386px] mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16 sm:h-18">
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-6">
+        <div className="flex items-center h-[74px] sm:h-[86px]">
           {/* Logo */}
-          <div className="flex items-center min-w-[85px]" ref={logoRef}>
+          <div className="flex items-center min-w-[88px] sm:min-w-[110px] mr-3 sm:mr-8" ref={logoRef}>
             <Link href="#" className="inline-block group">
               <Image
                 src="/logo1.svg"
                 alt="Logo"
                 width={108}
                 height={36}
-                className="h-auto 2xl:w-[170px] w-[150px] transition-transform duration-300 group-hover:scale-105"
+                className="h-auto 2xl:w-[170px] w-[138px] sm:w-[155px] transition-transform duration-300 group-hover:scale-105"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex flex-1 justify-center min-w-[180px]">
+          <nav className="hidden lg:flex flex-1 min-w-[180px] justify-center">
             <ul
-              className="flex flex-wrap justify-center gap-1"
+              className="flex flex-wrap justify-center gap-x-2 2xl:gap-x-5 gap-y-1"
               ref={navRef}
             >
               {navLinks.map((link, idx) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className={`text-white hover:bg-[#0C1524] hover:text-[#139bfd] transition-all transition-colors duration-300 font-bold 2xl:text-[1rem] text-[14px] px-3 py-2 rounded-md whitespace-nowrap ${montserrat.className}`}
+                    className={`text-white hover:bg-[#0C1524dd] hover:text-[#139bfd] transition-all duration-300 font-bold 2xl:text-[1.09rem] text-[15px] px-3.5 py-2 rounded-xl whitespace-nowrap ${montserrat.className}`}
                     tabIndex={0}
-                    // Slight breath animation on hover, modern effect
                     style={{
                       transition:
                         "color 0.23s cubic-bezier(.7,0,.3,1), background 0.26s cubic-bezier(.8,0,.15,1), transform 0.25s cubic-bezier(.7,0,.2,1)",
                     }}
                     onMouseEnter={e => {
-                      gsap.to(e.currentTarget, { scale: 1.09, duration: 0.2, ease: "power1.out" });
+                      gsap.to(e.currentTarget, { scale: 1.09, duration: 0.19, ease: "power1.out" });
                     }}
                     onMouseLeave={e => {
-                      gsap.to(e.currentTarget, { scale: 1.0, duration: 0.18, ease: "power1.out" });
+                      gsap.to(e.currentTarget, { scale: 1.0, duration: 0.15, ease: "power1.out" });
                     }}
                   >
                     {link.name}
@@ -226,7 +236,7 @@ const Header = () => {
 
           {/* Social Icons (Visible on all screens) */}
           <div
-            className="hidden lg:flex min-w-[105px] justify-end items-center xl:gap-3 gap-2"
+            className="hidden lg:flex min-w-[105px] justify-end items-center xl:gap-3 gap-2 ml-4"
             ref={socialDesktopRef}
           >
             {socialLinks.map((social) => (
@@ -237,7 +247,7 @@ const Header = () => {
                 rel="noopener noreferrer"
                 aria-label={social.name}
                 className="group relative 2xl:w-10 2xl:h-10 w-8 h-8 rounded-full 
-                  bg-[#0B0704] flex items-center justify-center text-white 
+                  bg-[#0B0704aa] flex items-center justify-center text-white 
                   hover:bg-sky-500 hover:text-black 
                   transition-all duration-300 ease-in-out
                   shadow-sm hover:shadow-lg
@@ -260,7 +270,7 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden flex items-center justify-center w-10 h-10 text-[#139bfd] focus:outline-none"
+            className="lg:hidden ml-auto flex items-center justify-center w-11 h-11 text-[#139bfd] focus:outline-none rounded-xl bg-[#17243615] hover:bg-[#0e1e2a33] transition"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
             tabIndex={0}
@@ -290,17 +300,27 @@ const Header = () => {
         <div
           style={{
             pointerEvents: isMenuOpen ? "auto" : "none",
-            // Keep space so layout does not jump
-            minHeight: isMenuOpen ? 170 : 0,
+            minHeight: isMenuOpen ? 182 : 0,
           }}
         >
           <div
-            className="lg:hidden py-4 border-t border-gray-800"
+            className="lg:hidden py-4 border-t border-gray-800 mt-1 
+                       rounded-2xl shadow-2xl 
+                       relative
+                       z-30
+                       backdrop-blur-xl
+                       bg-gradient-to-br from-[#101B28ee] to-[#112233bb]
+                       "
             ref={mobileDropdownRef}
             style={{
               opacity: isMenuOpen ? 1 : 0,
               transform: isMenuOpen ? "translateY(0px)" : "translateY(-30px)",
               willChange: "opacity, transform",
+              boxShadow: "0 8px 32px 8px rgba(14,25,41,0.24), 0 1.5px 12px 0 rgba(50,120,255,0.07)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              WebkitBackdropFilter: "blur(19px)",
+              backdropFilter: "blur(19px)",
+              marginTop: "-5px"
             }}
             aria-hidden={!isMenuOpen}
             tabIndex={isMenuOpen ? 0 : -1}
@@ -314,11 +334,12 @@ const Header = () => {
                   rel="noopener noreferrer"
                   aria-label={social.name}
                   className="ml-3 group relative w-9 h-9 rounded-full 
-                    bg-[#0B0704] flex items-center justify-center text-white 
+                    bg-[#0B0704bb] flex items-center justify-center text-white 
                     hover:bg-sky-500 hover:text-black 
                     transition-all duration-300 ease-in-out
                     shadow-sm hover:shadow-md
-                    border border-gray-700/30 hover:border-sky-400/50"
+                    border border-gray-700/30 hover:border-sky-400/50
+                    backdrop-blur-md"
                   tabIndex={isMenuOpen ? 0 : -1}
                   onMouseEnter={e =>
                     gsap.to(e.currentTarget, { scale: 1.11, boxShadow: "0 4px 14px #139bfd55", duration: 0.17, ease: "expo.out" })
@@ -334,12 +355,12 @@ const Header = () => {
               ))}
             </div>
 
-            <ul className="flex flex-col gap-2 px-4">
+            <ul className="flex flex-col gap-2 px-3">
               {navLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className={`block text-white hover:bg-[#0C1524] hover:text-[#139bfd] transition-all transition-colors font-bold px-4 py-3 rounded-md ${montserrat.className}`}
+                    className={`block text-white hover:bg-[#142138]/90 hover:text-[#139bfd] transition-all font-bold px-4 py-3 rounded-xl ${montserrat.className}`}
                     onClick={() => setIsMenuOpen(false)}
                     tabIndex={isMenuOpen ? 0 : -1}
                     style={{
