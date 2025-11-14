@@ -196,7 +196,9 @@ const Footer = () => {
         {starsData.map((star, i) => (
           <div
             key={i}
-            ref={el => (starRefs.current[i] = el)}
+            ref={el => {
+              starRefs.current[i] = el;
+            }}
             className="absolute rounded-full bg-white opacity-40"
             style={{
               width: `${star.width}px`,
