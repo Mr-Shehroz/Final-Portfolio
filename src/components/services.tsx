@@ -407,7 +407,7 @@ const Services = () => {
               ref={imgContainerRef}
             >
               <img
-                src="/about.svg"
+                src="/services.svg"
                 alt="Full Stack Developer & Automation Specialist"
                 className="w-full h-full object-cover"
                 style={{
