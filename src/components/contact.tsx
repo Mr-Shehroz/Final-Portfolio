@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import axios from 'axios';
 
 const EmailIcon = () => (
   <svg width="22" height="22" fill="none" viewBox="0 0 24 24" className="text-cyan-400">
@@ -26,6 +27,9 @@ const PhoneIcon = () => (
   </svg>
 );
 
+// Dummy api route to be implemented in /pages/api/contact.ts
+// For now, we'll POST to `/api/contact`
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -48,16 +52,25 @@ const Contact = () => {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    // Simulate API call
-    setTimeout(() => {
+    // Validation of essential fields could be stricter, but follow same requirements as before
+    if (!formData.name || !formData.email || !formData.message) {
       setIsSubmitting(false);
-      if (formData.name && formData.email && formData.message) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-      } else {
-        setSubmitStatus('error');
-      }
-    }, 1500);
+      setSubmitStatus('error');
+      return;
+    }
+
+    try {
+      // Send form data using axios POST to the API route `/api/contact`
+      await axios.post('/api/contact', formData, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      setIsSubmitting(false);
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch (error) {
+      setIsSubmitting(false);
+      setSubmitStatus('error');
+    }
   };
 
   return (
@@ -219,7 +232,7 @@ const Contact = () => {
 
               {submitStatus === 'error' && (
                 <div className="mt-4 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-300 text-sm">
-                  ❌ Please fill in all required fields.
+                  ❌ Please fill in all required fields or try again.
                 </div>
               )}
             </form>
