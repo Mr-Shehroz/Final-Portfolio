@@ -195,7 +195,7 @@ const Header = () => {
           <div className="flex items-center min-w-[88px] sm:min-w-[110px] mr-3 sm:mr-8" ref={logoRef}>
             <Link href="#" className="inline-block group">
               <Image
-                src="/logo1.svg"
+                src="/logo.svg"
                 alt="Logo"
                 width={108}
                 height={36}

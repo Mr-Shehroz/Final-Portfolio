@@ -117,7 +117,7 @@ const Hero = () => {
           A{" "}
           <span className="text-blue-400">
             {typeof window !== "undefined" && (
-              <span style={{ color: "#60a5fa" }}>
+              <span style={{ color: "#4DE3FD" }}>
                 <Typewriter
                   words={[
                     "Front End Developer",

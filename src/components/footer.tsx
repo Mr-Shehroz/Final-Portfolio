@@ -169,23 +169,6 @@ const Footer = () => {
     });
   };
 
-  const handleLogoHover = () => {
-    if (!logoRef.current) return;
-    gsap.fromTo(
-      logoRef.current,
-      { rotate: -8, scale: 1.05 },
-      {
-        rotate: 8,
-        scale: 1.12,
-        duration: 0.22,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: 1,
-        clearProps: "rotate,scale"
-      }
-    );
-  };
-
   // Pre-generate stars
   const STAR_COUNT = 20;
   const starsData = Array.from({ length: STAR_COUNT }).map(() => ({
@@ -238,12 +221,11 @@ const Footer = () => {
           <div className="flex items-center mb-6">
             <Image
               ref={logoRef}
-              src="/logo1.svg"
+              src="/logo.svg"
               height={100}
               width={100}
               alt="logo"
               className="2xl:w-[180px] w-[150px] cursor-pointer"
-              onMouseEnter={handleLogoHover}
             />
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold mb-6 leading-tight">
@@ -340,27 +322,71 @@ const Footer = () => {
           <h3 className="text-lg font-semibold mb-6">Follow Us</h3>
           <div className="flex space-x-4">
             {[
-              { name: "Instagram", href: "https://instagram.com/", icon: (
-                <svg fill="currentColor" viewBox="0 0 20 20" width="21" height="21">
-                  <path d="M10 7.01A2.99 2.99 0 1010 13a2.99 2.99 0 000-5.99zm0 4.93A1.94 1.94 0 1110 8.07a1.94 1.94 0 010 3.87zm4.55-1.42a.704.704 0 01.7-.71.705.705 0 011.41 0 .704.704 0 01-.7.7.704.704 0 01-.71-.7zM10 4.1a5.9 5.9 0 105.9 5.9A5.9 5.9 0 0010 4.1zm0 10.55a4.65 4.65 0 114.65-4.65A4.65 4.65 0 0110 14.65z"/>
-                </svg>
-              )},
-              { name: "LinkedIn", href: "https://linkedin.com/", icon: (
-                <svg fill="currentColor" viewBox="0 0 24 24" width="21" height="21">
-                  <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11.4 19h-3v-9h3v9zm-1.5-10.29c-.97 0-1.75-.79-1.75-1.76s.78-1.76 1.75-1.76 1.75.79 1.75 1.76-.78 1.76-1.75 1.76zm14.9 10.29h-3v-4.89c0-1.16-.02-2.65-1.62-2.65-1.62 0-1.87 1.27-1.87 2.57v4.97h-3v-9h2.89v1.23h.04c.4-.76 1.38-1.56 2.83-1.56 3.02 0 3.58 1.99 3.58 4.58v5.75z" />
-                </svg>
-              )},
-              { name: "Twitter", href: "https://x.com/", icon: (
-                <svg fill="currentColor" viewBox="0 0 24 24" width="21" height="21">
-                  <path d="M21.543 7.104c.015.207.015.414.015.623 0 6.348-4.836 13.657-13.657 13.657-2.71 0-5.23-.792-7.358-2.143.377.044.753.066 1.13.066 2.25 0 4.32-.765 5.967-2.056-2.104-.04-3.885-1.428-4.504-3.328.292.055.59.083.897.083.435 0 .86-.06 1.257-.166-2.213-.447-3.879-2.397-3.879-4.736v-.06c.652.362 1.4.58 2.194.605-1.3-.872-2.154-2.36-2.154-4.042 0-.893.24-1.728.66-2.445 2.407 2.954 6.013 4.896 10.078 5.1-.084-.357-.128-.73-.128-1.115 0-2.685 2.179-4.864 4.868-4.864 1.398 0 2.666.59 3.553 1.54 1.11-.217 2.16-.625 3.102-1.184-.366 1.142-1.137 2.098-2.145 2.705 1-.119 1.958-.385 2.842-.777-.664 993-1.504 1.87-2.473 2.573z"/>
-                </svg>
-              )},
-              { name: "Facebook", href: "https://facebook.com/", icon: (
-                <svg fill="currentColor" viewBox="0 0 24 24" width="21" height="21">
-                  <path d="M22.675 0h-21.35c-.733 0-1.325.592-1.325 1.326v21.348c0 .733.592 1.326 1.325 1.326h11.495v-9.294h-3.078v-3.622h3.078v-2.671c0-3.066 1.872-4.736 4.602-4.736 1.312 0 2.437.097 2.768.141v3.213l-1.899.001c-1.492 0-1.783.709-1.783 1.751v2.301h3.567l-.465 3.622h-3.102V24h6.075c.73 0 1.323-.593 1.323-1.326V1.326C24 .592 23.405 0 22.675 0"/>
-                </svg>
-              )}
-            ].map((social, i) => (
+              {
+                name: "Instagram",
+                href: "https://instagram.com/",
+                icon: (
+                  // Modern (2024) Instagram Logo SVG - minimalist, up-to-date
+                  <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                ),
+              },
+              {
+                name: "LinkedIn",
+                href: "https://linkedin.com/in/mr-shehroz/",
+                icon: (
+                  // Clean "in" LinkedIn logo, SVG, bold, no box/border, modern
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="21"
+                    height="21"
+                    viewBox="0 0 32 32"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <text
+                      x="7"
+                      y="23"
+                      fontFamily="Inter, Arial, sans-serif"
+                      fontWeight="bold"
+                      fontSize="24"
+                      fill="currentColor"
+                      letterSpacing="1"
+                    >
+                      in
+                    </text>
+                  </svg>
+                ),
+              },
+              {
+                name: "Twitter",
+                href: "https://x.com/",
+                icon: (
+                  // X (Twitter) logo (modern, 2024, minimalist)
+                  <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4l16 16" />
+                    <path d="M20 4L4 20" />
+                  </svg>
+                ),
+              },
+              {
+                name: "Facebook",
+                href: "https://facebook.com/",
+                icon: (
+                  // Improved: Larger "F", no rounded square, bold and modern
+                  <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M14 3v4h3a.5.5 0 0 1 .5.5V9a.5.5 0 0 1-.5.5h-3V13h3a.5.5 0 0 1 .5.5v2.1a.5.5 0 0 1-.5.4h-3V21a.5.5 0 0 1-.5.5h-2.2a.5.5 0 0 1-.5-.5v-5h-2.1a.5.5 0 0 1-.5-.4l-.01-2.08a.5.5 0 0 1 .5-.5h2.11v-2.48c0-2 1.14-3.07 3.17-3.07h2.23a.5.5 0 0 1 .5.5v1.8a.5.5 0 0 1-.5.5H14Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                ),
+              }
+            ]
+            .map((social, i) => (
               <a
                 key={i}
                 href={social.href}
