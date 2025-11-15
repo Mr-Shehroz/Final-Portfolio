@@ -182,7 +182,7 @@ const Header = () => {
         py-0
         rounded-b-2xl
         shadow-[0_4px_32px_rgba(14,25,41,0.24)]
-        max-h-[90px]
+        md:max-h-[90px] max-h-[80px]
       "
       style={{
         WebkitBackdropFilter: "blur(18px)",
