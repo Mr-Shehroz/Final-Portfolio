@@ -1,11 +1,11 @@
 'use client';
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Register ScrollTrigger once
+// Register GSAP plugin (safe in client components)
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -15,8 +15,9 @@ const Footer = () => {
   const gridRef = useRef<HTMLDivElement>(null);
   const starRefs = useRef<(HTMLDivElement | null)[]>([]);
   const logoRef = useRef<HTMLImageElement>(null);
+  const textSpanRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
-  // Icons (unchanged)
+  // === ICONS ===
   const GithubIcon = () => (
     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" className="text-cyan-400">
       <rect width="24" height="24" rx="12" fill="#0E2232" />
@@ -41,77 +42,7 @@ const Footer = () => {
     </svg>
   );
 
-  // Animation setup
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const ctx = gsap.context(() => {
-      // Animate footer entrance
-      if (footerRef.current) {
-        gsap.fromTo(
-          footerRef.current,
-          { y: 80, opacity: 0, filter: 'blur(4px)' },
-          {
-            y: 0,
-            opacity: 1,
-            filter: 'blur(0)',
-            duration: 1.2,
-            ease: 'power4.out',
-            scrollTrigger: {
-              trigger: footerRef.current,
-              start: 'top 90%',
-              once: true,
-            },
-          }
-        );
-      }
-
-      // Animate columns (grid children)
-      if (gridRef.current) {
-        const gridChildren = Array.from(gridRef.current.children);
-        gsap.fromTo(
-          gridChildren,
-          { y: 40, opacity: 0, scale: 0.98, filter: 'blur(5px)' },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            filter: 'blur(0)',
-            duration: 1,
-            ease: 'power3.out',
-            stagger: 0.17,
-            scrollTrigger: {
-              trigger: footerRef.current,
-              start: 'top 90%',
-              once: true,
-            },
-          }
-        );
-      }
-
-      // Start twinkling stars AFTER scroll trigger
-      starRefs.current.forEach((star) => {
-        if (star) {
-          gsap.to(star, {
-            opacity: gsap.utils.random(0.2, 0.6),
-            scale: gsap.utils.random(0.7, 1.3),
-            y: gsap.utils.random(-12, 12),
-            x: gsap.utils.random(-8, 8),
-            duration: gsap.utils.random(1.4, 2.2),
-            repeat: -1,
-            yoyo: true,
-            ease: 'sine.inOut',
-            delay: Math.random() * 2,
-          });
-        }
-      });
-    }, footerRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  // === INTERACTIVE HOVER EFFECTS (unchanged logic) ===
-
+  // === HOVER INTERACTIONS ===
   const handleSocialMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
     gsap.to(e.currentTarget, {
       scale: 1.15,
@@ -127,7 +58,7 @@ const Footer = () => {
       scale: 1,
       backgroundColor: "#0a1a26",
       color: "#22d3ee",
-      boxShadow: "0 0px 0px #0000",
+      boxShadow: "0 0px 0px transparent",
       duration: 0.24,
       ease: "power2.in",
     });
@@ -169,7 +100,7 @@ const Footer = () => {
     });
   };
 
-  // Pre-generate stars
+  // === STARS ===
   const STAR_COUNT = 20;
   const starsData = Array.from({ length: STAR_COUNT }).map(() => ({
     width: Math.random() * 2 + 1,
@@ -177,6 +108,70 @@ const Footer = () => {
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 100}%`,
   }));
+
+  // === ANIMATIONS ON MOUNT ===
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const ctx = gsap.context(() => {
+      // Logo
+      gsap.fromTo(
+        logoRef.current,
+        { opacity: 0, y: 30, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "back.out(1.4)" }
+      );
+
+      // Text characters
+      gsap.fromTo(
+        textSpanRefs.current,
+        { opacity: 0, y: 25, rotationX: -80 },
+        {
+          opacity: 1,
+          y: 0,
+          rotationX: 0,
+          duration: 0.7,
+          stagger: 0.025,
+          ease: "power3.out",
+        }
+      );
+
+      // Twinkling stars
+      starRefs.current.forEach((star) => {
+        if (star) {
+          gsap.to(star, {
+            opacity: Math.random() * 0.5 + 0.3,
+            repeat: -1,
+            yoyo: true,
+            duration: 1.8 + Math.random() * 1.2,
+            ease: "sine.inOut",
+          });
+        }
+      });
+
+      // Grid columns (Quick Links, Contact, etc.)
+      const cols = Array.from(gridRef.current?.children || []);
+      cols.forEach((col, i) => {
+        gsap.fromTo(
+          col,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            delay: i * 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: footerRef.current,
+              start: "top 90%",
+              once: true,
+            },
+          }
+        );
+      });
+    });
+
+    return () => ctx.revert(); // Cleanup on unmount
+  }, []);
 
   return (
     <footer
@@ -198,14 +193,16 @@ const Footer = () => {
         {starsData.map((star, i) => (
           <div
             key={i}
-            ref={el => { starRefs.current[i] = el; }}
-            className="absolute rounded-full bg-white opacity-40"
+            ref={(el) => {
+              starRefs.current[i] = el;
+            }}
+            className="absolute rounded-full bg-white"
             style={{
               width: `${star.width}px`,
               height: `${star.height}px`,
               left: star.left,
               top: star.top,
-              pointerEvents: "none"
+              opacity: 0, // Will be animated
             }}
           />
         ))}
@@ -224,20 +221,36 @@ const Footer = () => {
               src="/logo.svg"
               height={100}
               width={100}
-              alt="logo"
+              alt="Shehroz Logo"
               className="2xl:w-[180px] w-[150px] cursor-pointer"
             />
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold mb-6 leading-tight">
             <span>
               {Array.from("Get Ready To").map((char, idx) => (
-                <span key={idx} style={{ display: 'inline-block' }}>{char}</span>
+                <span
+                  key={idx}
+                  ref={el => {
+                    if (el) textSpanRefs.current.push(el);
+                  }}
+                  className="inline-block"
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
               ))}
             </span>
             <br />
             <span className="text-cyan-300">
               {Array.from("Create Great").map((char, idx) => (
-                <span key={idx} style={{ display: "inline-block" }}>{char}</span>
+                <span
+                  key={idx}
+                  ref={(el) => {
+                    if (el) textSpanRefs.current.push(el);
+                  }}
+                  className="inline-block"
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
               ))}
             </span>
           </h2>
@@ -247,7 +260,7 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-6">Quick Link</h3>
           <ul className="space-y-3">
-            {["About", "Services", "Portfolio", "Contact"].map(item => (
+            {["About", "Services", "Portfolio", "Contact"].map((item) => (
               <li key={item}>
                 <a
                   href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
@@ -326,7 +339,6 @@ const Footer = () => {
                 name: "Instagram",
                 href: "https://instagram.com/",
                 icon: (
-                  // Modern (2024) Instagram Logo SVG - minimalist, up-to-date
                   <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="5" />
                     <circle cx="12" cy="12" r="4" />
@@ -338,7 +350,6 @@ const Footer = () => {
                 name: "LinkedIn",
                 href: "https://linkedin.com/in/mr-shehroz/",
                 icon: (
-                  // Clean "in" LinkedIn logo, SVG, bold, no box/border, modern
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="21"
@@ -365,7 +376,6 @@ const Footer = () => {
                 name: "Twitter",
                 href: "https://x.com/",
                 icon: (
-                  // X (Twitter) logo (modern, 2024, minimalist)
                   <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4l16 16" />
                     <path d="M20 4L4 20" />
@@ -376,7 +386,6 @@ const Footer = () => {
                 name: "Facebook",
                 href: "https://facebook.com/",
                 icon: (
-                  // Improved: Larger "F", no rounded square, bold and modern
                   <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M14 3v4h3a.5.5 0 0 1 .5.5V9a.5.5 0 0 1-.5.5h-3V13h3a.5.5 0 0 1 .5.5v2.1a.5.5 0 0 1-.5.4h-3V21a.5.5 0 0 1-.5.5h-2.2a.5.5 0 0 1-.5-.5v-5h-2.1a.5.5 0 0 1-.5-.4l-.01-2.08a.5.5 0 0 1 .5-.5h2.11v-2.48c0-2 1.14-3.07 3.17-3.07h2.23a.5.5 0 0 1 .5.5v1.8a.5.5 0 0 1-.5.5H14Z"
@@ -384,14 +393,13 @@ const Footer = () => {
                     />
                   </svg>
                 ),
-              }
-            ]
-            .map((social, i) => (
+              },
+            ].map((social, i) => (
               <a
                 key={i}
                 href={social.href}
                 aria-label={social.name}
-                className="w-10 h-10 bg-[#0a1a26] border border-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-colors"
+                className="w-10 h-10 bg-[#0a1a26] border border-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400"
                 target="_blank"
                 rel="noopener noreferrer"
                 onMouseEnter={handleSocialMouseEnter}

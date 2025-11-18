@@ -5,11 +5,12 @@ import axios from 'axios';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// Register ScrollTrigger safely
+// Register GSAP plugins
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+// Icons (unchanged)
 const EmailIcon = () => (
   <svg width="22" height="22" fill="none" viewBox="0 0 24 24" className="text-cyan-400">
     <rect width="24" height="24" rx="12" fill="#0E2232" />
@@ -46,149 +47,10 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  // Animation refs
-  const sectionRef = useRef<HTMLDivElement | null>(null);
-  const leftRef = useRef<HTMLDivElement | null>(null);
-  const rightRef = useRef<HTMLDivElement | null>(null);
-  const headingRef = useRef<HTMLHeadingElement | null>(null);
-  const emailIconRef = useRef<HTMLDivElement | null>(null);
-  const githubIconRef = useRef<HTMLDivElement | null>(null);
-  const phoneIconRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const ctx = gsap.context(() => {
-      // Animate main section
-      if (sectionRef.current) {
-        gsap.fromTo(
-          sectionRef.current,
-          { opacity: 0, y: 80, filter: 'blur(4px)' },
-          {
-            opacity: 1,
-            y: 0,
-            filter: 'blur(0)',
-            duration: 1.1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 85%',
-              once: true,
-            },
-          }
-        );
-      }
-
-      // Animate heading
-      if (headingRef.current) {
-        gsap.fromTo(
-          headingRef.current,
-          { opacity: 0, x: -40, filter: 'blur(5px)' },
-          {
-            opacity: 1,
-            x: 0,
-            filter: 'blur(0)',
-            duration: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 85%',
-              once: true,
-            },
-          }
-        );
-      }
-
-      // Animate left column
-      if (leftRef.current) {
-        gsap.fromTo(
-          leftRef.current,
-          { opacity: 0, x: -60, scale: 0.96, filter: 'blur(6px)' },
-          {
-            opacity: 1,
-            x: 0,
-            scale: 1,
-            filter: 'blur(0)',
-            duration: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 85%',
-              once: true,
-            },
-          }
-        );
-      }
-
-      // Animate right column (form)
-      if (rightRef.current) {
-        gsap.fromTo(
-          rightRef.current,
-          { opacity: 0, x: 60, scale: 0.96, filter: 'blur(6px)' },
-          {
-            opacity: 1,
-            x: 0,
-            scale: 1,
-            filter: 'blur(0)',
-            duration: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 85%',
-              once: true,
-            },
-          }
-        );
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  // Floating icons animation (runs after scroll trigger)
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const floatAnimations: gsap.core.Tween[] = [];
-
-    if (emailIconRef.current) {
-      floatAnimations.push(
-        gsap.to(emailIconRef.current, {
-          y: 7,
-          repeat: -1,
-          yoyo: true,
-          duration: 1.5,
-          ease: 'sine.inOut',
-        })
-      );
-    }
-    if (githubIconRef.current) {
-      floatAnimations.push(
-        gsap.to(githubIconRef.current, {
-          y: -7,
-          repeat: -1,
-          yoyo: true,
-          duration: 1.8,
-          ease: 'sine.inOut',
-        })
-      );
-    }
-    if (phoneIconRef.current) {
-      floatAnimations.push(
-        gsap.to(phoneIconRef.current, {
-          y: 5,
-          repeat: -1,
-          yoyo: true,
-          duration: 2.1,
-          ease: 'sine.inOut',
-        })
-      );
-    }
-
-    return () => {
-      (floatAnimations as Array<gsap.core.Tween>).forEach(anim => anim.kill());
-    };
-  }, []);
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
+  const infoItemsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const formRef = useRef(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -197,45 +59,82 @@ const Contact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus('idle');
-
     if (!formData.name || !formData.email || !formData.message) {
-      setIsSubmitting(false);
       setSubmitStatus('error');
       return;
     }
 
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
     try {
-      await axios.post('/api/contact', formData, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      setIsSubmitting(false);
+      await axios.post('/api/contact', formData);
       setSubmitStatus('success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-      if (rightRef.current) {
-        gsap.fromTo(
-          rightRef.current,
-          { backgroundColor: "#0a1a26" },
-          { backgroundColor: "#254153", duration: 0.5, yoyo: true, repeat: 1, ease: "power1.inOut" }
-        );
-      }
     } catch (error) {
-      setIsSubmitting(false);
       setSubmitStatus('error');
-      if (rightRef.current) {
-        gsap.fromTo(
-          rightRef.current,
-          { backgroundColor: "#0a1a26" },
-          { backgroundColor: "#3a1a1a", duration: 0.33, yoyo: true, repeat: 1, ease: "power1.inOut" }
-        );
-      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Animate section background/title
+    gsap.fromTo(
+      titleRef.current,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
+    );
+
+    // Animate contact info items (stagger)
+    gsap.fromTo(
+      infoItemsRef.current,
+      { opacity: 0, x: -30 },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0.7,
+        stagger: 0.15,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 85%',
+          toggleActions: 'play none none none',
+        },
+      }
+    );
+
+    // Animate form container
+    gsap.fromTo(
+      formRef.current,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: formRef.current,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+        },
+      }
+    );
+
+    return () => {
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
+  }, []);
+
   return (
-    <section id="contact" className="text-white py-20 px-5 mx-auto max-w-[1386px]">
-      <div ref={sectionRef} className="bg-[#06131b] border border-cyan-500/20 rounded-3xl overflow-hidden shadow-2xl relative">
+    <section
+      id="contact"
+      ref={sectionRef}
+      className="text-white py-20 px-5 mx-auto max-w-[1386px]"
+    >
+      <div className="bg-[#06131b] border border-cyan-500/20 rounded-3xl overflow-hidden shadow-2xl relative">
         {/* Glow effect */}
         <div
           className="absolute top-0 left-0 w-1/3 h-full bg-linear-to-r from-cyan-500/10 to-transparent rounded-l-3xl pointer-events-none"
@@ -244,8 +143,11 @@ const Contact = () => {
 
         <div className="flex flex-col lg:flex-row gap-8 p-8 sm:p-12">
           {/* Left Column - Info */}
-          <div ref={leftRef} className="lg:w-1/2 space-y-8">
-            <h2 ref={headingRef} className="text-3xl sm:text-4xl font-bold leading-tight">
+          <div className="lg:w-1/2 space-y-8">
+            <h2
+              ref={titleRef}
+              className="text-3xl sm:text-4xl font-bold leading-tight opacity-0"
+            >
               Get Ready To <br />
               <span className="text-cyan-300 relative after:content-[''] after:block after:absolute after:w-1/2 after:h-1 after:rounded after:bg-cyan-500/40 after:bottom-[-10px] after:left-0">
                 Create Great
@@ -253,164 +155,149 @@ const Contact = () => {
             </h2>
 
             <div className="space-y-6">
-              <div className="flex items-start gap-4 group">
+              {[0, 1, 2].map((i) => (
                 <div
-                  ref={emailIconRef}
-                  className="w-8 h-8 bg-cyan-500/10 border border-cyan-500 rounded-full flex items-center justify-center group-hover:bg-cyan-500/20 transition duration-200"
+                  key={i}
+                  ref={el => {
+                    infoItemsRef.current[i] = el;
+                  }}
+                  className="flex items-start gap-4 group opacity-0"
                 >
-                  <EmailIcon />
+                  <div className="w-8 h-8 bg-cyan-500/10 border border-cyan-500 rounded-full flex items-center justify-center group-hover:bg-cyan-500/20 transition duration-200">
+                    {i === 0 ? <EmailIcon /> : i === 1 ? <GitHubIcon /> : <PhoneIcon />}
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm">
+                      {i === 0 ? 'E-mail:' : i === 1 ? 'GitHub:' : 'Contact:'}
+                    </p>
+                    {i === 0 ? (
+                      <a
+                        href="mailto:shehroz.programmer@gmail.com"
+                        className="text-white hover:text-cyan-300 transition-colors"
+                      >
+                        shehroz.programmer@gmail.com
+                      </a>
+                    ) : i === 1 ? (
+                      <a
+                        href="https://github.com/Mr-Shehroz"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-white hover:text-cyan-300 transition-colors"
+                      >
+                        github.com/Mr-Shehroz
+                      </a>
+                    ) : (
+                      <a
+                        href="tel:923255706845"
+                        className="text-white hover:text-cyan-300 transition-colors"
+                      >
+                        +923255706845
+                      </a>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <p className="text-gray-400 text-sm">E-mail:</p>
-                  <a href="mailto:shehroz.programmer@gmail.com" className="text-white hover:text-cyan-300 transition-colors">
-                    shehroz.programmer@gmail.com
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 group">
-                <div
-                  ref={githubIconRef}
-                  className="w-8 h-8 bg-cyan-500/10 border border-cyan-500 rounded-full flex items-center justify-center group-hover:bg-cyan-500/20 transition duration-200"
-                >
-                  <GitHubIcon />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">GitHub:</p>
-                  <a
-                    href="https://github.com/Mr-Shehroz"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white hover:text-cyan-300 transition-colors"
-                  >
-                    github.com/Mr-Shehroz
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 group">
-                <div
-                  ref={phoneIconRef}
-                  className="w-8 h-8 bg-cyan-500/10 border border-cyan-500 rounded-full flex items-center justify-center group-hover:bg-cyan-500/20 transition duration-200"
-                >
-                  <PhoneIcon />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Contact:</p>
-                  <a href="tel:923255706845" className="text-white hover:text-cyan-300 transition-colors">
-                    +923255706845
-                  </a>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
           {/* Right Column - Form */}
-          <div ref={rightRef} className="lg:w-1/2">
+          <div ref={formRef} className="lg:w-1/2 opacity-0">
             <h3 className="text-lg font-semibold mb-6">GET IN TOUCH</h3>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Your Name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all animated-input"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="tel"
-                    name="phone"
-                    placeholder="Phone Number"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all animated-input"
-                  />
-                </div>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all animated-input"
+                />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone Number"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all animated-input"
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Your Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all animated-input"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    name="subject"
-                    placeholder="Subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all animated-input"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <textarea
-                  name="message"
-                  placeholder="Your Message"
-                  value={formData.message}
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your Email"
+                  value={formData.email}
                   onChange={handleChange}
                   required
-                  rows={5}
-                  className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all resize-none animated-input"
+                  className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all animated-input"
+                />
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder="Subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all animated-input"
                 />
               </div>
+
+              <textarea
+                name="message"
+                placeholder="Your Message"
+                value={formData.message}
+                onChange={handleChange}
+                required
+                rows={5}
+                className="w-full bg-[#0a1a26] border border-cyan-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all resize-none animated-input"
+              />
 
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className={`w-full bg-cyan-500 hover:bg-cyan-400 disabled:bg-cyan-500/70 text-white font-medium py-3 rounded-lg transition-all duration-300 flex items-center justify-center ${
                   isSubmitting ? 'opacity-80 cursor-not-allowed' : ''
-                } group`}
-                onMouseDown={e => {
-                  const btn = e.currentTarget;
-                  gsap.to(btn, { scale: 0.94, duration: 0.15, ease: 'power1.out' });
-                }}
-                onMouseUp={e => {
-                  const btn = e.currentTarget;
-                  gsap.to(btn, { scale: 1, duration: 0.18, ease: 'power1.out' });
-                }}
-                onMouseLeave={e => {
-                  const btn = e.currentTarget;
-                  gsap.to(btn, { scale: 1, duration: 0.18, ease: 'power1.out' });
-                }}
+                }`}
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.644z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.644z"
+                      ></path>
                     </svg>
                     Sending...
                   </>
                 ) : (
-                  <>
-                    Appointment Now →
-                  </>
+                  'Appointment Now →'
                 )}
               </button>
 
               {submitStatus === 'success' && (
-                <div className="mt-4 p-3 bg-green-500/20 border border-green-500 rounded-lg text-green-300 text-sm animated-success">
+                <div className="mt-4 p-3 bg-green-500/20 border border-green-500 rounded-lg text-green-300 text-sm animate-fadeInUp">
                   ✅ Message sent successfully! I'll get back to you soon.
                 </div>
               )}
 
               {submitStatus === 'error' && (
-                <div className="mt-4 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-300 text-sm animated-error">
+                <div className="mt-4 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-300 text-sm animate-fadeInUp">
                   ❌ Please fill in all required fields or try again.
                 </div>
               )}
@@ -419,22 +306,26 @@ const Contact = () => {
         </div>
       </div>
 
-      <style>
-        {`
+      <style jsx>{`
         .animated-input:focus {
           box-shadow: 0 0 0 2px #22d3ee50, 0 2px 12px #0ff3ff22;
           transition: box-shadow 0.25s cubic-bezier(.67,1.57,.7,.5);
         }
-        .animated-success, .animated-error {
-          animation: msgPop 0.5s cubic-bezier(.1,1.2,.8,1) forwards;
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-        @keyframes msgPop {
-          0% { transform: scale(0.88) translateY(24px); opacity: 0.2; }
-          80% { transform: scale(1.05) translateY(0px); opacity: 1; }
-          100% { transform: scale(1) translateY(0px); opacity: 1; }
+        .animate-fadeInUp {
+          animation: fadeInUp 0.4s ease-out forwards;
         }
-        `}
-      </style>
+      `}</style>
     </section>
   );
 };

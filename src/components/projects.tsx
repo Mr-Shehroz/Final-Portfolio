@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useRef, useEffect } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Register ScrollTrigger once
-if (typeof window !== 'undefined') {
+// Register once (safe to do in component if using 'use client')
+if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
@@ -29,6 +29,9 @@ const ExternalLinkIcon = () => (
 );
 
 const Projects = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const projectRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const projects = [
     {
       title: "E-Commerce Platform with Real-Time Inventory Sync",
@@ -37,7 +40,7 @@ const Projects = () => {
       tech: ["React", "Node.js", "PostgreSQL", "Stripe API"],
       image: "/ecommerce.jpg",
       github: "https://github.com/Mr-Shehroz/full-ecommerce",
-      demo: "https://full-ecommerce-five-inky.vercel.app/"
+      demo: "https://full-ecommerce-five-inky.vercel.app/",
     },
     {
       title: "Admin Panel for E-Commerce Web",
@@ -46,7 +49,7 @@ const Projects = () => {
       tech: ["React", "Redux Toolkit", "Node.js", "MongoDB", "Ant Design"],
       image: "/panel.jpg",
       github: "https://github.com/Mr-Shehroz/full-admin",
-      demo: "https://full-admin-delta.vercel.app/"
+      demo: "https://full-admin-delta.vercel.app/",
     },
     {
       title: "NFT Landing Page with Headless CMS",
@@ -55,16 +58,23 @@ const Projects = () => {
       tech: ["Next.js", "TypeScript", "Sanity.io", "Tailwind CSS", "Web3.js"],
       image: "/nft.png",
       github: "https://github.com/Mr-Shehroz/age",
-      demo: "https://age-mocha.vercel.app/"
+      demo: "https://age-mocha.vercel.app/",
     },
     {
       title: "Full Stack Blog Platform",
       description:
         "A full-stack blog system featuring Markdown support, comments, authentication, admin workflow, and deployment-ready API. Built for speed and SEO. Effortless writing, reading and managing blog content.",
-      tech: ["Next.js", "React", "Express.js", "MongoDB", "JWT", "Tailwind CSS"],
+      tech: [
+        "Next.js",
+        "React",
+        "Express.js",
+        "MongoDB",
+        "JWT",
+        "Tailwind CSS",
+      ],
       image: "/blog.jpg",
       github: "https://github.com/Mr-Shehroz/full-stack-blog",
-      demo: "https://full-stack-blog-rho.vercel.app/"
+      demo: "https://full-stack-blog-rho.vercel.app/",
     },
     {
       title: "Salon Website & Booking System",
@@ -73,96 +83,63 @@ const Projects = () => {
       tech: ["React", "Next.js", "TypeScript", "Tailwind CSS", "MongoDB"],
       image: "/salon.png",
       github: "https://github.com/Mr-Shehroz/salon",
-      demo: "https://khushibeautysalon.vercel.app/"
+      demo: "https://khushibeautysalon.vercel.app/",
     },
   ];
 
-  const sectionRef = useRef<HTMLDivElement | null>(null);
-  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const headerRef = useRef<HTMLDivElement | null>(null);
-
-  const setCardRef = (el: HTMLDivElement | null, i: number) => {
-    cardRefs.current[i] = el;
-  };
-
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
-    const ctx = gsap.context(() => {
-      // Animate Header with a soft fade and slight upward spring from below, more modern "pop"
-      if (headerRef.current) {
-        gsap.fromTo(
-          headerRef.current.children,
-          { opacity: 0, y: 40, scale: 0.96, filter: 'blur(18px)' },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 1,
-            stagger: 0.13,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 85%',
-              once: true,
-            }
-          }
-        );
-      }
+    // Animate section header
+    const header = sectionRef.current?.querySelector(".section-header");
+    if (header) {
+      gsap.fromTo(
+        header,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+        }
+      );
+    }
 
-      // Project cards rise up from below with a springy, lively pop effect
-      if (cardRefs.current.length > 0) {
-        cardRefs.current.forEach((card, i) => {
-          if (!card) return;
-          gsap.fromTo(
-            card,
-            {
-              opacity: 0,
-              y: 120,
-              scale: 0.94,
-              filter: 'blur(16px)',
-            },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              filter: 'blur(0px)',
-              duration: 1 + Math.random() * 0.28,
-              delay: i * 0.12 + 0.09,
-              ease: 'elastic.out(1, 0.7)',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 90%',
-                once: true,
-              },
-              onComplete: () => {
-                // Soft "bounce" to give it a fresh pop (less punchy, more springy)
-                gsap.to(card, {
-                  scale: 1.025,
-                  duration: 0.17,
-                  yoyo: true,
-                  repeat: 1,
-                  ease: 'sine.inOut',
-                });
-              }
-            }
-          );
-        });
-      }
-    }, sectionRef);
+    // Animate each project card on scroll
+    projectRefs.current.forEach((el, i) => {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 50, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.7,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+            end: "bottom 20%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    });
 
-    return () => ctx.revert();
+    return () => {
+      // Clean up ScrollTriggers
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
   }, []);
 
   return (
     <section
-      ref={sectionRef}
       id="portfolio"
+      ref={sectionRef}
       className="text-white py-20 px-5 mx-auto max-w-[1386px]"
     >
       {/* Header */}
-      <div ref={headerRef} className="text-center mb-12">
+      <div className="section-header text-center mb-12">
         <h5 className="text-cyan-400 text-sm uppercase tracking-wider">
           LATEST PORTFOLIO
         </h5>
@@ -170,7 +147,9 @@ const Projects = () => {
           Transforming Ideas into Exceptional Systems
         </h2>
         <p className="mt-4 text-gray-300 max-w-3xl mx-auto leading-relaxed">
-          I build scalable, intelligent solutions that solve real business problems — combining clean code with automation to deliver measurable impact.
+          I build scalable, intelligent solutions that solve real business
+          problems — combining clean code with automation to deliver measurable
+          impact.
         </p>
       </div>
 
@@ -179,7 +158,9 @@ const Projects = () => {
         {projects.map((project, index) => (
           <div
             key={index}
-            ref={(el) => setCardRef(el, index)}
+            ref={(el: HTMLDivElement | null) => {
+              (projectRefs.current as Array<HTMLDivElement | null>)[index] = el;
+            }}
             className="group relative bg-[#06131b] border border-cyan-500/20 rounded-xl overflow-hidden transition-all duration-300 will-change-transform"
             tabIndex={0}
           >
@@ -188,8 +169,8 @@ const Projects = () => {
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
               style={{
                 background:
-                  'radial-gradient(circle at 60% 40%, #36ccfd36 20%, #139bfd16 80%, transparent 100%)',
-                filter: 'blur(16px)',
+                  "radial-gradient(circle at 60% 40%, #36ccfd36 20%, #139bfd16 80%, transparent 100%)",
+                filter: "blur(16px)",
                 zIndex: -1,
               }}
             />
@@ -202,7 +183,7 @@ const Projects = () => {
                 className="w-full h-[220px] sm:h-[280px] xl:h-[380px] object-cover transition-transform duration-500 group-hover:scale-[1.04] group-hover:rotate-[-0.5deg]"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#06131b] via-transparent to-transparent opacity-90"></div>
+              <div className="absolute inset-0 bg-linear-to-t from-[#06131b] via-transparent to-transparent opacity-90"></div>
             </div>
 
             {/* Content */}
