@@ -1,60 +1,58 @@
-// src/components/SmoothScrollProvider.tsx
+// src/components/SmoothScrollWrapper.tsx
 'use client';
 
-import React, { ReactNode, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from '@studio-freight/lenis';
 
-// Do NOT import Locomotive Scroll at top level
-
-interface DeviceOptions {
-  smooth: boolean;
-  breakpoint: number;
-}
-
-interface SmoothScrollProviderProps {
-  children: ReactNode;
-}
-
-const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ children }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollInstance = useRef<any>(null);
+const SmoothScrollWrapper = ({ children }: { children: React.ReactNode }) => {
+  const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    import('locomotive-scroll').then((LocomotiveModule) => {
-      const LocomotiveScroll = LocomotiveModule.default;
-
-      if (scrollInstance.current) {
-        scrollInstance.current.destroy();
-      }
-
-      if (scrollRef.current) {
-        // Set breakpoints according to Locomotive Scroll docs to fix type error
-        scrollInstance.current = new LocomotiveScroll({
-          el: scrollRef.current,
-          smooth: true,
-          smartphone: { smooth: true }, // 0 = always applies on mobile
-          tablet: { smooth: true, breakpoint: 768 },   // 768 is a typical tablet breakpoint
-          multiplier: 1.05,
-          class: 'is-inview',
-          reloadOnContextChange: true,
-        });
-      }
+    // ✅ Lenis v1+ — no "smooth", "duration", or "easing" at top level
+    const lenis = new Lenis({
+      lerp: 0.1, // smoothness (0 = instant, 1 = super smooth)
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      infinite: false,
     });
 
+    lenisRef.current = lenis;
+
+    // Sync with GSAP ScrollTrigger
+    lenis.on('scroll', ScrollTrigger.update);
+
+    // RAF loop
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Optional: expose globally
+    (window as any).lenis = lenis;
+
+    // Cleanup
     return () => {
-      if (scrollInstance.current) {
-        scrollInstance.current.destroy();
-        scrollInstance.current = null;
-      }
+      lenis.destroy();
+      lenisRef.current = null;
+      (window as any).lenis = null;
     };
   }, []);
 
-  return (
-    <div data-scroll-container ref={scrollRef}>
-      {children}
-    </div>
-  );
+  // Refresh ScrollTrigger after hydration
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return <>{children}</>;
 };
 
-export default SmoothScrollProvider;
+export default SmoothScrollWrapper;
