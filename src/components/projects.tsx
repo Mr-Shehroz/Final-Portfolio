@@ -174,7 +174,6 @@ const Projects = () => {
                 zIndex: -1,
               }}
             />
-
             {/* Image Container */}
             <div className="relative overflow-hidden rounded-t-xl">
               <img
@@ -183,9 +182,9 @@ const Projects = () => {
                 className="w-full h-[220px] sm:h-[280px] xl:h-[380px] object-cover transition-transform duration-500 group-hover:scale-[1.04] group-hover:rotate-[-0.5deg]"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-[#06131b] via-transparent to-transparent opacity-90"></div>
+              {/* ✅ Fixed gradient class */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#06131b] via-transparent to-transparent opacity-90"></div>
             </div>
-
             {/* Content */}
             <div className="p-6 pt-4">
               <h3 className="text-xl sm:text-2xl font-bold mb-3 text-cyan-300 group-hover:text-cyan-400 transition-colors duration-300">
@@ -229,7 +228,6 @@ const Projects = () => {
                 </a>
               </div>
             </div>
-
             {/* Lift Shadow on Hover */}
             <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-2xl shadow-cyan-500/20 -z-10"></div>
           </div>

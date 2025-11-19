@@ -1,4 +1,4 @@
-// src/components/canva1.tsx
+// src/components/canva2.tsx
 'use client';
 import React, { useEffect, useRef, useCallback } from 'react';
 
@@ -7,7 +7,7 @@ const SCROLL_DURATION = '300vh';
 const CANVAS_HEIGHT = '100vh';
 
 const IMAGE_PATH = (idx: number) =>
-  `/canvas1/frame_${idx.toString().padStart(4, '0')}.jpg`;
+  `/canvas2/frame_${idx.toString().padStart(4, '0')}.jpg`;
 
 const preloadImages = (): Promise<HTMLImageElement[]> => {
   return Promise.all(
@@ -22,7 +22,7 @@ const preloadImages = (): Promise<HTMLImageElement[]> => {
   );
 };
 
-const Canva1: React.FC = () => {
+const Canva2: React.FC = () => {
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
@@ -137,7 +137,7 @@ const Canva1: React.FC = () => {
         }}
       />
 
-      {/* ✅ Overlay: Add content on top of the canvas */}
+      {/* ✅ Updated Overlay — leads into Testimonials */}
       <div
         style={{
           position: 'sticky',
@@ -149,41 +149,40 @@ const Canva1: React.FC = () => {
           justifyContent: 'center',
           alignItems: 'center',
           color: 'white',
-          zIndex: 10, // Above canvas
-          pointerEvents: 'none', // Optional: lets scroll pass through if needed
+          zIndex: 10,
+          pointerEvents: 'none',
           padding: '1.5rem',
           boxSizing: 'border-box',
           background: 'linear-gradient(to bottom, rgba(0,0,0,1), transparent 70%)',
         }}
       >
-        {/* Optional: Add your brand, tagline, or minimal UI */}
         <h1
           style={{
-            fontSize: '2.5rem',
-            fontWeight: 700,
-            textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+            fontSize: '2.6rem',
+            fontWeight: 800,
+            textShadow: '0 2px 12px rgba(0,0,0,0.6)',
             textAlign: 'center',
             maxWidth: '800px',
-            lineHeight: 1.2,
+            lineHeight: 1.25,
           }}
         >
-          Crafting Digital Experiences
+          Real Solutions. Real Impact. Real Feedback.
         </h1>
         <p
           style={{
-            marginTop: '1rem',
-            fontSize: '1.1rem',
-            opacity: 0.9,
+            marginTop: '1.2rem',
+            fontSize: '1.15rem',
+            opacity: 0.92,
             textAlign: 'center',
-            maxWidth: '600px',
-            textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+            maxWidth: '650px',
+            textShadow: '0 1px 5px rgba(0,0,0,0.5)',
           }}
         >
-          Scroll to explore the journey
+          The work speaks for itself — here's what clients say
         </p>
       </div>
     </div>
   );
 };
 
-export default Canva1;
+export default Canva2;  
