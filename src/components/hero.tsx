@@ -26,6 +26,11 @@ const Hero = () => {
   const descRef = useRef<HTMLParagraphElement>(null);
   const btnRef = useRef<HTMLAnchorElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+    // ✅ Build Cloudinary video URL
+    const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'duwampjn2';
+    const VIDEO_ID =  'banner';
+  
+    const videoUrl = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/video/upload/${VIDEO_ID}.mp4`;
 
   useEffect(() => {
     // Animate content in sequence
@@ -76,7 +81,7 @@ const Hero = () => {
     >
       {/* Fullscreen Video Background */}
       <div className="absolute inset-0 z-0">
-        <video
+      <video
           ref={videoRef}
           autoPlay
           muted
@@ -85,9 +90,9 @@ const Hero = () => {
           className="w-full h-full object-cover"
           aria-hidden="true"
         >
-          <source src="/banner.mp4" type="video/mp4" />
-          {/* Fallback: solid color if video fails */}
-          <div className="bg-[#0a0a0a] w-full h-full" />
+          <source src={videoUrl} type="video/mp4" />
+          {/* Fallback image or color if video fails */}
+          <div className="bg-[#0a0a0a] w-full h-full absolute inset-0" />
         </video>
       </div>
 
