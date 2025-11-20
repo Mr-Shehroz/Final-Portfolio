@@ -6,8 +6,24 @@ const TOTAL_FRAMES = 121;
 const SCROLL_DURATION = '300vh';
 const CANVAS_HEIGHT = '100vh';
 
-const IMAGE_PATH = (idx: number) =>
-  `/canvas1/frame_${idx.toString().padStart(4, '0')}.jpg`;
+// Safely read env vars (fallback to empty string if missing)
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '';
+const CLOUDINARY_FOLDER = process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER_1 || 'canvas1';
+
+// Validate env vars in development
+if (process.env.NODE_ENV === 'development' && !CLOUDINARY_CLOUD_NAME) {
+  console.warn('⚠️ NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME is not set in .env.local');
+}
+
+const IMAGE_PATH = (idx: number): string => {
+  if (!CLOUDINARY_CLOUD_NAME) {
+    return `/canvas1/frame_${idx.toString().padStart(4, '0')}.jpg`;
+  }
+
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${CLOUDINARY_FOLDER}/frame_${idx
+    .toString()
+    .padStart(4, '0')}.jpg`;
+};
 
 const preloadImages = (): Promise<HTMLImageElement[]> => {
   return Promise.all(

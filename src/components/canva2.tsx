@@ -1,4 +1,4 @@
-// src/components/canva2.tsx
+// src/components/canva1.tsx
 'use client';
 import React, { useEffect, useRef, useCallback } from 'react';
 
@@ -6,8 +6,24 @@ const TOTAL_FRAMES = 121;
 const SCROLL_DURATION = '300vh';
 const CANVAS_HEIGHT = '100vh';
 
-const IMAGE_PATH = (idx: number) =>
-  `/canvas2/frame_${idx.toString().padStart(4, '0')}.jpg`;
+// Safely read env vars (fallback to empty string if missing)
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '';
+const CLOUDINARY_FOLDER = process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER_2 || 'canvas2';
+
+// Validate env vars in development
+if (process.env.NODE_ENV === 'development' && !CLOUDINARY_CLOUD_NAME) {
+  console.warn('⚠️ NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME is not set in .env.local');
+}
+
+const IMAGE_PATH = (idx: number): string => {
+  if (!CLOUDINARY_CLOUD_NAME) {
+    return `/canvas2/frame_${idx.toString().padStart(4, '0')}.jpg`;
+  }
+
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${CLOUDINARY_FOLDER}/frame_${idx
+    .toString()
+    .padStart(4, '0')}.jpg`;
+};
 
 const preloadImages = (): Promise<HTMLImageElement[]> => {
   return Promise.all(
@@ -137,7 +153,7 @@ const Canva2: React.FC = () => {
         }}
       />
 
-      {/* ✅ Updated Overlay — leads into Testimonials */}
+      {/* ✅ Overlay: Add content on top of the canvas */}
       <div
         style={{
           position: 'sticky',
@@ -149,40 +165,41 @@ const Canva2: React.FC = () => {
           justifyContent: 'center',
           alignItems: 'center',
           color: 'white',
-          zIndex: 10,
-          pointerEvents: 'none',
+          zIndex: 10, // Above canvas
+          pointerEvents: 'none', // Optional: lets scroll pass through if needed
           padding: '1.5rem',
           boxSizing: 'border-box',
           background: 'linear-gradient(to bottom, rgba(0,0,0,1), transparent 70%)',
         }}
       >
+        {/* Optional: Add your brand, tagline, or minimal UI */}
         <h1
           style={{
-            fontSize: '2.6rem',
-            fontWeight: 800,
-            textShadow: '0 2px 12px rgba(0,0,0,0.6)',
+            fontSize: '2.5rem',
+            fontWeight: 700,
+            textShadow: '0 2px 10px rgba(0,0,0,0.5)',
             textAlign: 'center',
             maxWidth: '800px',
-            lineHeight: 1.25,
+            lineHeight: 1.2,
           }}
         >
-          Real Solutions. Real Impact. Real Feedback.
+          Crafting Digital Experiences
         </h1>
         <p
           style={{
-            marginTop: '1.2rem',
-            fontSize: '1.15rem',
-            opacity: 0.92,
+            marginTop: '1rem',
+            fontSize: '1.1rem',
+            opacity: 0.9,
             textAlign: 'center',
-            maxWidth: '650px',
-            textShadow: '0 1px 5px rgba(0,0,0,0.5)',
+            maxWidth: '600px',
+            textShadow: '0 1px 4px rgba(0,0,0,0.5)',
           }}
         >
-          The work speaks for itself — here's what clients say
+          Scroll to explore the journey
         </p>
       </div>
     </div>
   );
 };
 
-export default Canva2;  
+export default Canva2;
