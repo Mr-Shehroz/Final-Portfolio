@@ -183,7 +183,7 @@ const Canva2: React.FC = () => {
             lineHeight: 1.2,
           }}
         >
-          Crafting Digital Experiences
+          What Clients Say About My Work
         </h1>
         <p
           style={{
@@ -195,7 +195,7 @@ const Canva2: React.FC = () => {
             textShadow: '0 1px 4px rgba(0,0,0,0.5)',
           }}
         >
-          Scroll to explore the journey
+          Real experiences, honest feedback, and stories from the people I've worked with.
         </p>
       </div>
     </div>
