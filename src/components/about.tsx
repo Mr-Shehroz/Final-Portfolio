@@ -394,7 +394,7 @@ const About = () => {
                 ABOUT ME
               </h5>
               <h2
-                className="text-3xl sm:text-4xl xl:text-5xl font-bold mt-2"
+                className="text-[32px] sm:text-4xl xl:text-[40px] 2xl:text-[45px] font-bold mt-2"
                 ref={(el) => setHeadingRef(el, 1)}
               >
                 Engineering Scalable Solutions with Code & Intelligence
