@@ -30,9 +30,9 @@ const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`${poppins.className} px-6 sm:px-8 py-3 sm:py-4 mt-4 sm:mt-5 text-white font-medium rounded-full text-sm sm:text-base relative overflow-hidden border border-[#ffffff80] shadow-md hover:shadow-lg transition-all duration-300 ${className}`}
+      className={`${poppins.className} px-6 sm:px-8 py-3 sm:py-4 mt-4 sm:mt-5 text-white font-medium rounded-full text-sm sm:text-base hover:cursor-pointer relative overflow-hidden border border-[#ffffff80] shadow-md hover:shadow-lg transition-all duration-300 ${className}`}
       style={{
-        background: `url(${isHovered ? '/btn-hover.svg' : '/btn.svg'}) center center / cover no-repeat`,
+        background: `url(${isHovered ? '/btn-hover.webp' : '/btn.webp'}) center center / cover no-repeat`,
       }}
     >
       {children}

@@ -1,9 +1,8 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, MouseEvent } from "react";
 import { Montserrat, Poppins } from "next/font/google";
 import { Typewriter } from "react-simple-typewriter";
 import Button from "./ui/button";
-import Link from "next/link";
 import gsap from "gsap";
 
 const montserrat = Montserrat({
@@ -26,11 +25,11 @@ const Hero = () => {
   const descRef = useRef<HTMLParagraphElement>(null);
   const btnRef = useRef<HTMLAnchorElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-    // ✅ Build Cloudinary video URL
-    const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'duwampjn2';
-    const VIDEO_ID =  'banner';
-  
-    const videoUrl = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/video/upload/${VIDEO_ID}.mp4`;
+
+  // ✅ Build Cloudinary video URL
+  const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const VIDEO_ID = 'banner';
+  const videoUrl = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/video/upload/${VIDEO_ID}.mp4`;
 
   useEffect(() => {
     // Animate content in sequence
@@ -74,6 +73,22 @@ const Hero = () => {
     );
   }, []);
 
+  // ---- Smooth scroll handler with 10vh offset ----
+  const handleButtonClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (typeof window === "undefined") return;
+    const targetId = "portfolio";
+    const target = document.getElementById(targetId) || document.querySelector(`[name='${targetId}']`);
+    if (target) {
+      // 10vh offset: compute y position minus 10% window height
+      const rect = target.getBoundingClientRect();
+      const vhOffset = window.innerHeight * 0.1;
+      // Position = element top relative to viewport + current scroll position - offset
+      const scrollTo = rect.top + window.scrollY - vhOffset;
+      window.scrollTo({ top: scrollTo, behavior: "smooth" });
+    }
+  };
+
   return (
     <section
       ref={sectionRef}
@@ -81,7 +96,7 @@ const Hero = () => {
     >
       {/* Fullscreen Video Background */}
       <div className="absolute inset-0 z-0">
-      <video
+        <video
           ref={videoRef}
           autoPlay
           muted
@@ -149,9 +164,14 @@ const Hero = () => {
           I build scalable web applications and intelligent automation systems that drive innovation, reduce costs, and accelerate growth for modern enterprises.
         </p>
 
-        <Link href="#portfolio" ref={btnRef} className="opacity-0">
+        <a
+          href="#portfolio"
+          ref={btnRef}
+          className="opacity-0"
+          onClick={handleButtonClick}
+        >
           <Button>View My Work</Button>
-        </Link>
+        </a>
       </div>
     </section>
   );

@@ -1,10 +1,44 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Montserrat } from "next/font/google";
 import gsap from "gsap";
+
+// --- Smooth scroll handler for anchor links with offset ---
+function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string, closeMenu?: () => void) {
+  // Check if it's a hash link and not just a slash
+  if (href.startsWith("#") && href.length > 1) {
+    const id = href.slice(1);
+    const el = document.getElementById(id);
+    if (el) {
+      e.preventDefault();
+      // Calculate offset (10vh)
+      const offset = window.innerHeight * 0.10;
+      const elementTop = el.getBoundingClientRect().top + window.pageYOffset;
+      const scrollTo = Math.max(0, elementTop - offset);
+
+      window.scrollTo({
+        top: scrollTo,
+        behavior: "smooth",
+      });
+
+      // Close mobile menu if needed
+      if (typeof closeMenu === "function") {
+        closeMenu();
+      }
+    }
+    // Don't follow the link
+    return;
+  }
+  // Also handle the "/" (home) case
+  if (href === "/" || href === "#") {
+    // Let default behavior happen (next/link or a)
+    if (typeof closeMenu === "function") {
+      closeMenu();
+    }
+  }
+}
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -194,12 +228,12 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center min-w-[88px] sm:min-w-[110px] mr-3 sm:mr-8" ref={logoRef}>
             <Link href="#" className="inline-block group">
-              <Image
+              <img
                 src="/logo.svg"
                 alt="Logo"
                 width={108}
                 height={36}
-                className="h-auto 2xl:w-[170px] w-[138px] sm:w-[155px] transition-transform duration-300 group-hover:scale-105"
+                className="h-auto 2xl:w-[170px] w-[138px] sm:w-[155px]"
               />
             </Link>
           </div>
@@ -226,6 +260,7 @@ const Header = () => {
                     onMouseLeave={e => {
                       gsap.to(e.currentTarget, { scale: 1.0, duration: 0.15, ease: "power1.out" });
                     }}
+                    onClick={e => handleSmoothScroll(e, link.href)}
                   >
                     {link.name}
                   </a>
@@ -361,7 +396,9 @@ const Header = () => {
                   <a
                     href={link.href}
                     className={`block text-white hover:bg-[#142138]/90 hover:text-[#139bfd] transition-all font-bold px-4 py-3 rounded-xl ${montserrat.className}`}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={e => {
+                      handleSmoothScroll(e, link.href, () => setIsMenuOpen(false));
+                    }}
                     tabIndex={isMenuOpen ? 0 : -1}
                     style={{
                       transition:

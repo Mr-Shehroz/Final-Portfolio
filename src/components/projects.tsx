@@ -1,13 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef, useEffect, RefCallback } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-// Register once (safe to do in component if using 'use client')
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 // SVG Icons (unchanged)
 const GithubIcon = () => (
@@ -29,8 +23,14 @@ const ExternalLinkIcon = () => (
 );
 
 const Projects = () => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const projectRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const headerRef = useRef<HTMLDivElement>(null);
+  // Store card DOM nodes, keep the array stable
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Helper: Get ref function by index, so refs array is stable
+  const getCardRef = (index: number): RefCallback<HTMLDivElement> => (el) => {
+    cardRefs.current[index] = el;
+  };
 
   const projects = [
     {
@@ -38,7 +38,7 @@ const Projects = () => {
       description:
         "Built a full-stack React/Node.js e-commerce store with automated inventory sync across multiple warehouses using webhooks and cron jobs. Reduced manual stock updates by 90%.",
       tech: ["React", "Node.js", "PostgreSQL", "Stripe API"],
-      image: "/ecommerce.jpg",
+      image: "/ecommerce.webp",
       github: "https://github.com/Mr-Shehroz/full-ecommerce",
       demo: "https://full-ecommerce-five-inky.vercel.app/",
     },
@@ -47,7 +47,7 @@ const Projects = () => {
       description:
         "Developed a robust admin dashboard for managing products, orders, users, and analytics. Real-time stats, user roles, inventory tools and bulk operations for easy store maintenance.",
       tech: ["React", "Redux Toolkit", "Node.js", "MongoDB", "Ant Design"],
-      image: "/panel.jpg",
+      image: "/panel.webp",
       github: "https://github.com/Mr-Shehroz/full-admin",
       demo: "https://full-admin-delta.vercel.app/",
     },
@@ -56,7 +56,7 @@ const Projects = () => {
       description:
         "Created a modern NFT landing page with real-time content editing using Sanity CMS. Includes NFT showcase, wallet connect, creator stories, and dynamic updates from CMS without redeploy.",
       tech: ["Next.js", "TypeScript", "Sanity.io", "Tailwind CSS", "Web3.js"],
-      image: "/nft.png",
+      image: "/nft.webp",
       github: "https://github.com/Mr-Shehroz/age",
       demo: "https://age-mocha.vercel.app/",
     },
@@ -72,7 +72,7 @@ const Projects = () => {
         "JWT",
         "Tailwind CSS",
       ],
-      image: "/blog.jpg",
+      image: "/blog.webp",
       github: "https://github.com/Mr-Shehroz/full-stack-blog",
       demo: "https://full-stack-blog-rho.vercel.app/",
     },
@@ -81,65 +81,54 @@ const Projects = () => {
       description:
         "Developed a modern salon web application with online appointment booking, service selection, stylist profiles, real-time availability, and automated confirmations. Includes admin dashboard to manage bookings, staff, and promotions seamlessly.",
       tech: ["React", "Next.js", "TypeScript", "Tailwind CSS", "MongoDB"],
-      image: "/salon.png",
+      image: "/salon.webp",
       github: "https://github.com/Mr-Shehroz/salon",
       demo: "https://khushibeautysalon.vercel.app/",
     },
   ];
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    // Animate section header
-    const header = sectionRef.current?.querySelector(".section-header");
-    if (header) {
+    // Header animation (fade/slide up each header item)
+    if (headerRef.current) {
+      const headerItems = Array.from(headerRef.current.children);
       gsap.fromTo(
-        header,
-        { opacity: 0, y: 30 },
+        headerItems,
+        { y: 50, opacity: 0 },
         {
-          opacity: 1,
           y: 0,
-          duration: 0.8,
-          ease: "power3.out",
+          opacity: 1,
+          duration: 0.7,
+          stagger: 0.14,
+          ease: "power2.out",
         }
       );
     }
 
-    // Animate each project card on scroll
-    projectRefs.current.forEach((el, i) => {
+    // Cards animation (fade/slide up staggered)
+    const filteredCardRefs = cardRefs.current.filter(Boolean) as HTMLDivElement[];
+    if (filteredCardRefs.length) {
       gsap.fromTo(
-        el,
-        { opacity: 0, y: 50, scale: 0.95 },
+        filteredCardRefs,
+        { y: 60, opacity: 0 },
         {
-          opacity: 1,
           y: 0,
-          scale: 1,
-          duration: 0.7,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 90%",
-            end: "bottom 20%",
-            toggleActions: "play none none none",
-          },
+          opacity: 1,
+          delay: 0.45,
+          stagger: 0.16,
+          duration: 0.9,
+          ease: "power2.out",
         }
       );
-    });
-
-    return () => {
-      // Clean up ScrollTriggers
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
+    }
   }, []);
 
   return (
     <section
       id="portfolio"
-      ref={sectionRef}
       className="text-white py-20 px-5 mx-auto max-w-[1386px]"
     >
       {/* Header */}
-      <div className="section-header text-center mb-12">
+      <div className="section-header text-center mb-12" ref={headerRef}>
         <h5 className="text-cyan-400 text-sm uppercase tracking-wider">
           LATEST PORTFOLIO
         </h5>
@@ -158,9 +147,7 @@ const Projects = () => {
         {projects.map((project, index) => (
           <div
             key={index}
-            ref={(el: HTMLDivElement | null) => {
-              (projectRefs.current as Array<HTMLDivElement | null>)[index] = el;
-            }}
+            ref={getCardRef(index)}
             className="group relative bg-[#06131b] border border-cyan-500/20 rounded-xl overflow-hidden transition-all duration-300 will-change-transform"
             tabIndex={0}
           >
